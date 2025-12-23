@@ -233,6 +233,9 @@ std::vector<Element> run_batch_pir(
     // 这里的 row_size 就是子桶容量，对应 PIR 中的 col_size
     results = my_direct_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
                    is_compress, input_db, query_indices, row_size, online_time);
+    // 能正常运行的非紧凑Batch PIR调用 
+    // results = my_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
+    //                is_compress, input_db, query_indices, online_time);
                    
     return results;
 }

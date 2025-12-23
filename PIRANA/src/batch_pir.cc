@@ -273,7 +273,8 @@ std::vector<Element> my_direct_batch_pir_main(
   
   Server batch_server(pir_parms, false); // false = not random db
   batch_server.set_database(input_db);   // 填入数据
-  batch_server.direct_encode_to_ntt_db(); // 调用 Direct 编码
+  // batch_server.direct_encode_to_ntt_db(); // 调用 Direct 编码
+  batch_server.encode_to_ntt_db(); // 直接调用通用编码
   batch_server.set_keys(keys);
   
   auto init_time = timer.elapsed();

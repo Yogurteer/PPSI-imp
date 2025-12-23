@@ -74,52 +74,128 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   print_pir_parms();
 }
 
+// PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
+//                    const uint64_t num_query, const uint64_t direct_col_size)
+//     : _num_payloads(num_payloads),
+//       _payload_size(payload_size),
+//       _num_query(num_query),
+//       _col_size(direct_col_size),
+//       _is_compress(false), // Direct模式通常配合压缩使用
+//       _enable_rotate(false) {
+
+//   // 1. 设置 SEAL 参数 (保持与原Batch相同或根据需要调整)
+//   // uint64_t poly_degree = 8192; // 之前建议的参数
+//   // std::vector<int> coeff_modulus = {56, 56, 24, 24};
+//   // 原始参数设置
+//   uint64_t poly_degree = 4096;
+//   std::vector<int> coeff_modulus = {48, 32, 24};
+
+//   uint64_t plain_prime_len = _is_compress? 18 : 17;
+//   set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
+
+//   // 2. 计算基本尺寸
+//   _num_payload_slot = std::ceil(payload_size * 8.0 / (plain_prime_len - 1));
+  
+//   // 3. 计算 Direct Mode 的维度
+//   // 在 Direct Mode 下，table_size 实际上就是总的物理行数
+//   // 即：ceil(num_payloads / col_size)
+//   // 但为了复用 PIRANA 逻辑，我们让 table_size = num_query (即总子桶数)
+//   uint32_t N = _seal_parms.poly_modulus_degree();
+  
+//   // 计算打包参数
+//   _num_slot = std::floor(N / num_query); 
+//   if (_num_slot == 0) _num_slot = 1; // 防止除0
+  
+//   _table_size = num_query; // 直接对应查询数量（子桶数）
+//   _bundle_size = 1;        // Direct模式通常设为1
+
+//   // 4. 计算 Encoding Size (m)
+//   // 这是 PIRANA 核心：k-out-of-m coding
+//   // col_size 是子桶容量，即每一行的元素个数
+//   _encoding_size = calculate_encoding_size(_col_size);
+
+//   std::cout << "Direct PIR Params: " << std::endl;
+//   std::cout << "  N: " << N << std::endl;
+//   std::cout << "  Col Size (Capacity): " << _col_size << std::endl;
+//   std::cout << "  Encoding Size (m): " << _encoding_size << std::endl;
+  
+//   // 关键：这里不再调用 get_all_index_hash_result (Skip Cuckoo)
+//   print_seal_parms();
+//   print_pir_parms();
+// }
+
+// 【修正后的 Direct Mode 构造函数】
 PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
                    const uint64_t num_query, const uint64_t direct_col_size)
     : _num_payloads(num_payloads),
       _payload_size(payload_size),
       _num_query(num_query),
       _col_size(direct_col_size),
-      _is_compress(false), // Direct模式通常配合压缩使用
+      _is_compress(true), // Direct Mode 通常开启压缩
       _enable_rotate(false) {
 
-  // 1. 设置 SEAL 参数 (保持与原Batch相同或根据需要调整)
-  // uint64_t poly_degree = 8192; // 之前建议的参数
-  // std::vector<int> coeff_modulus = {56, 56, 24, 24};
-  // 原始参数设置
-  uint64_t poly_degree = 4096;
-  std::vector<int> coeff_modulus = {48, 32, 24};
+  // 1. 恢复 k=2 (PIRANA 核心)
+  // 注意：请确保头文件 pir_parms.h 中的 _hamming_weight 设 2
 
-  uint64_t plain_prime_len = _is_compress? 18 : 17;
+  // 2. 设置 SEAL 参数 (保持不变)
+  uint64_t poly_degree = 4096;
+  std::vector<int> coeff_modulus = {56, 56, 24, 24};
+  uint64_t plain_prime_len = 18;
   set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
 
-  // 2. 计算基本尺寸
   _num_payload_slot = std::ceil(payload_size * 8.0 / (plain_prime_len - 1));
-  
-  // 3. 计算 Direct Mode 的维度
-  // 在 Direct Mode 下，table_size 实际上就是总的物理行数
-  // 即：ceil(num_payloads / col_size)
-  // 但为了复用 PIRANA 逻辑，我们让 table_size = num_query (即总子桶数)
+
+  // 3. 设置 PIRANA 结构参数
   uint32_t N = _seal_parms.poly_modulus_degree();
-  
-  // 计算打包参数
-  _num_slot = std::floor(N / num_query); 
-  if (_num_slot == 0) _num_slot = 1; // 防止除0
-  
-  _table_size = num_query; // 直接对应查询数量（子桶数）
-  _bundle_size = 1;        // Direct模式通常设为1
+  _num_slot = std::floor(N / num_query);
+  if (_num_slot == 0) _num_slot = 1;
 
-  // 4. 计算 Encoding Size (m)
-  // 这是 PIRANA 核心：k-out-of-m coding
-  // col_size 是子桶容量，即每一行的元素个数
-  _encoding_size = calculate_encoding_size(_col_size);
+  _table_size = num_query; // 桶的数量 = 查询数量 (行数)
+  _bundle_size = 1;
 
-  std::cout << "Direct PIR Params: " << std::endl;
-  std::cout << "  N: " << N << std::endl;
-  std::cout << "  Col Size (Capacity): " << _col_size << std::endl;
-  std::cout << "  Encoding Size (m): " << _encoding_size << std::endl;
+  // 4. 【核心修改】手动构建 "完美" 的桶结构 (Mock Cuckoo Hash)
+  // 我们不再调用 get_all_index_hash_result (它是随机的)
+  // 而是确定性地填充 _bucket
   
-  // 关键：这里不再调用 get_all_index_hash_result (Skip Cuckoo)
+  std::cout << "Direct Mode: Building deterministic buckets..." << std::endl;
+  
+  _bucket.resize(_table_size); // 调整桶数量
+  
+  // 我们假设输入数据是 row-major 的，即:
+  // Row 0: [0, 1, ..., col_size-1]
+  // Row 1: [col_size, ..., 2*col_size-1]
+  
+  // 遍历每一行 (相当于每一个 Bucket)
+  for (uint32_t row = 0; row < _table_size; ++row) {
+      // 遍历该行的每一列
+      for (uint32_t col = 0; col < _col_size; ++col) {
+          uint64_t global_idx = row * _col_size + col;
+          
+          // 只有当 global_idx 在有效范围内时才添加
+          if (global_idx < _num_payloads) {
+              _bucket[row].push_back(global_idx);
+              
+              // 同时也更新 _hash_index 映射 (Server 编码时可能用到)
+              // Key: string(global_idx), Value: 它在桶内的位置(也就是 col)
+              _hash_index[std::to_string(global_idx)] = col;
+          }
+      }
+  }
+
+  // 5. 计算编码映射表 (Codeword Index)
+  // 这一步非常重要！它决定了 k=2 的两个 1 在哪里
+  _cw_index.resize(_col_size);
+  _encoding_size = calculate_encoding_size(_col_size); // 计算 m
+  
+  for (uint64_t index = 0; index < _col_size; index++) {
+    _cw_index[index] = get_cw_code_k2(index, _encoding_size);
+  }
+
+  std::cout << "Direct Mode Params Initialized:" << std::endl;
+  std::cout << "  k=" << _hamming_weight << ", m=" << _encoding_size << std::endl;
+  std::cout << "  Table Size (Rows): " << _table_size << std::endl;
+  std::cout << "  Col Size: " << _col_size << std::endl;
+  
   print_seal_parms();
   print_pir_parms();
 }
