@@ -54,12 +54,12 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   assert(is_batch == true && num_query > 1);
 
   // 原始参数设置
-  // uint64_t poly_degree = 4096;
-  // std::vector<int> coeff_modulus = {48, 32, 24};
+  uint64_t poly_degree = 4096;
+  std::vector<int> coeff_modulus = {48, 32, 24};
 
   // 优化后参数设置,适配大规模Batch PIR,DB size 2^20起步
-  uint64_t poly_degree = 8192;
-  std::vector<int> coeff_modulus = {56, 56, 24, 24};
+  // uint64_t poly_degree = 8192;
+  // std::vector<int> coeff_modulus = {56, 56, 24, 24};
 
   uint64_t plain_prime_len = is_compress? 18 : 17;
 
@@ -138,18 +138,40 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   // 注意：请确保头文件 pir_parms.h 中的 _hamming_weight 设 2
 
   // 2. 设置 SEAL 参数 (保持4096不变)
-  uint64_t poly_degree = 4096;
-  std::vector<int> coeff_modulus = {48, 32, 24};
-  // uint64_t poly_degree = 8192; 
-  // std::vector<int> coeff_modulus = {56, 56, 24, 24};
+  // uint64_t poly_degree = 4096;
+  // std::vector<int> coeff_modulus = {48, 32, 24};
+  uint64_t poly_degree = 8192; 
+  std::vector<int> coeff_modulus = {56, 56, 24, 24};
   uint64_t plain_prime_len = 18;
   set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
 
   _num_payload_slot = std::ceil(payload_size * 8.0 / (plain_prime_len - 1));
 
   // 3. 设置 PIRANA 结构参数
+  // uint32_t N = _seal_parms.poly_modulus_degree();
+  // // _num_slot = std::floor(N / num_query);
+  // // 当num_query小于N时,统一设置_num_slot为1以防止过度分割
+  // if (num_query <= N) {
+  //     _num_slot = 1; 
+  // } else {
+  //     _num_slot = std::floor(N / num_query); // Fallback
+  // }
+  // if (_num_slot == 0) _num_slot = 1;
+  
   uint32_t N = _seal_parms.poly_modulus_degree();
-  _num_slot = std::floor(N / num_query);
+  
+  // 计算每个查询最大可用的 slot 数量
+  double ratio = (double)N / num_query;
+  
+  // 向下取整到最近的 2 的幂次 (例如 682 -> 512)
+  // 这保证了 PIRANA 的旋转和打包逻辑不会错位
+  uint32_t log2_ratio = 0;
+  if (ratio >= 1.0) {
+      log2_ratio = std::floor(std::log2(ratio));
+  }
+  _num_slot = 1 << log2_ratio; 
+  
+  // 兜底：如果 N < num_query，则 bundle > 1，这里设为1
   if (_num_slot == 0) _num_slot = 1;
 
   _table_size = num_query; // 桶的数量 = 查询数量 (行数)
