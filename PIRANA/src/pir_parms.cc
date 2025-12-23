@@ -131,15 +131,15 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
       _payload_size(payload_size),
       _num_query(num_query),
       _col_size(direct_col_size),
-      _is_compress(true), // Direct Mode 通常开启压缩
+      _is_compress(false), // Direct Mode 通常开启压缩
       _enable_rotate(false) {
 
   // 1. 恢复 k=2 (PIRANA 核心)
   // 注意：请确保头文件 pir_parms.h 中的 _hamming_weight 设 2
 
-  // 2. 设置 SEAL 参数 (保持不变)
+  // 2. 设置 SEAL 参数 (保持4096不变)
   uint64_t poly_degree = 4096;
-  std::vector<int> coeff_modulus = {56, 56, 24, 24};
+  std::vector<int> coeff_modulus = {48, 32, 24};
   uint64_t plain_prime_len = 18;
   set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
 
