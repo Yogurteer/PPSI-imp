@@ -208,7 +208,7 @@ std::vector<Element> my_batch_pir_main(const uint64_t num_payloads, const uint64
   auto result_convert_time = timer.elapsed();
 
   std::cout << "------------------------------------" << std::endl;
-  std::cout << "Performance: " << std::endl;
+  std::cout << "Performance(Naive Mode):: " << std::endl;
   std::cout << "Init time: " << init_time << " ms " << std::endl;
   std::cout << "Gen query time: " << query_time << " ms " << std::endl;
   std::cout << "Gen response time: " << response_time << " ms " << std::endl;

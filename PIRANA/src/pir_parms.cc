@@ -131,7 +131,7 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
       _payload_size(payload_size),
       _num_query(num_query),
       _col_size(direct_col_size),
-      _is_compress(false), // Direct Mode 通常开启压缩
+      _is_compress(true), // Direct Mode 通常开启压缩
       _enable_rotate(false) {
 
   // 1. 恢复 k=2 (PIRANA 核心)
@@ -140,6 +140,8 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   // 2. 设置 SEAL 参数 (保持4096不变)
   uint64_t poly_degree = 4096;
   std::vector<int> coeff_modulus = {48, 32, 24};
+  // uint64_t poly_degree = 8192; 
+  // std::vector<int> coeff_modulus = {56, 56, 24, 24};
   uint64_t plain_prime_len = 18;
   set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
 
@@ -153,41 +155,36 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   _table_size = num_query; // 桶的数量 = 查询数量 (行数)
   _bundle_size = 1;
 
-  // 4. 【核心修改】手动构建 "完美" 的桶结构 (Mock Cuckoo Hash)
-  // 我们不再调用 get_all_index_hash_result (它是随机的)
-  // 而是确定性地填充 _bucket
+  // 4. 【核心修复 - 防止 Segfault】手动构建 "完美" 桶结构
+  // Server 编码时严重依赖 _bucket 和 _hash_index
+  // 必须初始化它们，否则 crash！
   
   std::cout << "Direct Mode: Building deterministic buckets..." << std::endl;
   
-  _bucket.resize(_table_size); // 调整桶数量
+  _bucket.resize(_table_size); 
   
-  // 我们假设输入数据是 row-major 的，即:
-  // Row 0: [0, 1, ..., col_size-1]
-  // Row 1: [col_size, ..., 2*col_size-1]
-  
-  // 遍历每一行 (相当于每一个 Bucket)
   for (uint32_t row = 0; row < _table_size; ++row) {
-      // 遍历该行的每一列
       for (uint32_t col = 0; col < _col_size; ++col) {
           uint64_t global_idx = row * _col_size + col;
           
-          // 只有当 global_idx 在有效范围内时才添加
+          // 边界检查：不要放入超出 num_payloads 的索引
           if (global_idx < _num_payloads) {
               _bucket[row].push_back(global_idx);
               
-              // 同时也更新 _hash_index 映射 (Server 编码时可能用到)
-              // Key: string(global_idx), Value: 它在桶内的位置(也就是 col)
+              // 【关键】Server 依赖这个 map 来反查元素的列位置
               _hash_index[std::to_string(global_idx)] = col;
           }
       }
   }
 
-  // 5. 计算编码映射表 (Codeword Index)
-  // 这一步非常重要！它决定了 k=2 的两个 1 在哪里
+  // 5. 【核心修复 - 防止 Segfault】初始化 Codeword 索引表
+  // k=2 编码必须用到 _cw_index。如果是空的，Server 访问时必定段错误。
+  
   _cw_index.resize(_col_size);
   _encoding_size = calculate_encoding_size(_col_size); // 计算 m
   
   for (uint64_t index = 0; index < _col_size; index++) {
+    // 预计算每一列对应的 k=2 组合
     _cw_index[index] = get_cw_code_k2(index, _encoding_size);
   }
 
@@ -195,6 +192,7 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   std::cout << "  k=" << _hamming_weight << ", m=" << _encoding_size << std::endl;
   std::cout << "  Table Size (Rows): " << _table_size << std::endl;
   std::cout << "  Col Size: " << _col_size << std::endl;
+  std::cout << "  Hash Index Size: " << _hash_index.size() << std::endl;
   
   print_seal_parms();
   print_pir_parms();

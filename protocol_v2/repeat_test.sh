@@ -37,7 +37,7 @@ cd build
 
 # 运行CMake
 echo -e "${GREEN}运行CMake配置...${NC}"
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake ..
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}CMake配置失败!${NC}"

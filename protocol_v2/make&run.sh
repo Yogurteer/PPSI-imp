@@ -34,7 +34,7 @@ fi
 
 echo -e "${GREEN}编译成功!${NC}"
 echo ""
-# ./bin/lpsi_test -x 4096 -y 256 -p 1
-./bin/lpsi_test -x 256 -y 1 -p 1
+./bin/lpsi_test -x 256 -y 256 -p 1
+# ./bin/lpsi_test -x 256 -y 1 -p 1
 
 
