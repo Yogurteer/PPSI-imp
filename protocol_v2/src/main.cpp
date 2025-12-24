@@ -701,7 +701,8 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     std::cout << "[PIR外部验证] 模拟与实际结果匹配: " << (pir_match ? "YES" : "NO") << std::endl;
     
     // recevier处理PIR结果兼容格式
-    receiver.process_pir_results(receiver.sim_pir_results);
+    // receiver.process_pir_results(receiver.sim_pir_results);
+    receiver.process_pir_results(receiver.pir_results);
 
     // [5] OT
     std::cout << "\n[5] 正在执行: OT..." << std::endl;
@@ -781,7 +782,7 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
 int main(int argc, char** argv) {
     // 默认参数
     size_t sender_size = 4096;   // 默认 2^12
-    size_t receiver_size = 256;  // 默认 2^8
+    size_t receiver_size = 1024;  // 默认 2^8
     size_t payload_size = 1;     // 默认 1 byte
     
 
@@ -820,7 +821,7 @@ int main(int argc, char** argv) {
     if (receiver_size == 1) {
         batch_PIR_mode = "default"; // 单元素查询使用默认模式
     }
-    // batch_PIR_mode = "default"; 
+    batch_PIR_mode = "default"; 
     run_main(sender_size, receiver_size, payload_size, batch_PIR_mode);
     
     return 0;

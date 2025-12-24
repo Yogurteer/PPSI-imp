@@ -138,10 +138,10 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   // 注意：请确保头文件 pir_parms.h 中的 _hamming_weight 设 2
 
   // 2. 设置 SEAL 参数 (保持4096不变)
-  uint64_t poly_degree = 4096;
-  std::vector<int> coeff_modulus = {48, 32, 24};
-  // uint64_t poly_degree = 8192; 
-  // std::vector<int> coeff_modulus = {56, 56, 24, 24};
+  // uint64_t poly_degree = 4096;
+  // std::vector<int> coeff_modulus = {48, 32, 24};
+  uint64_t poly_degree = 8192; 
+  std::vector<int> coeff_modulus = {56, 56, 24, 24};
   uint64_t plain_prime_len = 18;
   set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
 

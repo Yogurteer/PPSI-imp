@@ -55,7 +55,7 @@ echo -e "${BLUE}  run${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
-./bin/lpsi_test -x 4096 -y 512 -p 1
+./bin/lpsi_test -x 4096 -y 1024 -p 1
 # ./bin/lpsi_test -x 256 -y 64 -p 1
 
 if [ $? -ne 0 ]; then
