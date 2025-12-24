@@ -22,79 +22,59 @@ Client::Client(/* args */ PirParms &pir_parms) : _pir_parms(pir_parms) {
 std::stringstream Client::gen_direct_batch_query(
     const std::vector<uint32_t> &direct_indices) {
     
-  std::cout << "Client: Generating Direct Batch Query (Multi-Bundle)..." << std::endl;
+  std::cout << "Client: Generating Direct Batch Query (Independent Bundles)..." << std::endl;
   std::stringstream query_stream;
   uint64_t send_size = 0;
   
-  // 1. 获取参数
+  // 参数检查
   assert(direct_indices.size() == _pir_parms.get_num_query());
 
   auto encoding_size = _pir_parms.get_encoding_size(); // m
-  auto bundle_size = _pir_parms.get_bundle_size();     // Bundle 数量 (例如 2)
-  auto num_slot = _pir_parms.get_num_slot();           // 步长 (例如 1 或 256)
-  
-  // 总的查询密文数量 = m * bundle_size
-  // 逻辑结构: [Col0_B0, Col0_B1...], [Col1_B0, Col1_B1...]
+  auto bundle_size = _pir_parms.get_bundle_size();     // e.g. 2
+  auto num_slot = _pir_parms.get_num_slot();           // 1
+
+  // 总大小 = m * bundle_size
+  // 布局: [Bundle 0 所有 m 个密文] [Bundle 1 所有 m 个密文]
   auto query_ct_size = encoding_size * bundle_size;
   
-  // 2. 初始化查询矩阵 (全0)
-  // 外层维度: query_ct_size
-  // 内层维度: N (4096 or 8192)
   std::vector<std::vector<uint64_t>> cw_query(query_ct_size,
                                               std::vector<uint64_t>(_N, 0));
 
-  // 3. 核心逻辑：填充查询向量
-  // 遍历每一个查询 (即每一行)
   for (uint32_t i = 0; i < direct_indices.size(); ++i) {
-      uint32_t offset = direct_indices[i]; // 这一行想要查的列号 (0 ~ col_size-1)
-      uint32_t loc = i;                    // 这一行在 Table 中的逻辑行号 (Query ID)
+      uint32_t offset = direct_indices[i]; // Col Index
+      uint32_t loc = i;                    // Row Index
       
-      // (A) 获取 Codeword (对应列选择信号)
-      // 返回 pair<index1, index2>，表示这一列由哪两个 m 向量组成
       auto cw = get_cw_code_k2(offset, encoding_size);
 
-      // (B) 确定物理位置 (Bundle + Slot)
-      // 遍历 num_slot，将 1 填入连续的 num_slot 个位置中
       for (uint32_t slot = 0; slot < num_slot; slot++) {
-        
-        // 计算绝对物理槽位索引 (Absolute Slot Index)
-        // 假设把所有 Bundle 首尾相连看作一个超长数组
         uint64_t absolute_pos = (uint64_t)loc * num_slot + slot;
         
-        // 分解为 Bundle Index 和 Slot Index
+        // 计算归属
         uint32_t bundle_idx = absolute_pos / _N;
         uint32_t slot_idx = absolute_pos % _N;
 
-        // 边界检查：确保不超出分配的 Bundle 范围
-        if (bundle_idx < bundle_size) {            
-            // 设置第一个 1
-            if (cw.first < encoding_size) {
-                uint32_t q_idx1 = cw.first * bundle_size + bundle_idx;
-                cw_query.at(q_idx1).at(slot_idx) = 1;
-            }
+        if (bundle_idx < bundle_size) {
+            // 【核心修改】级联布局索引计算
+            // Base Index = bundle_idx * encoding_size
+            uint32_t base_idx = bundle_idx * encoding_size;
             
-            // 设置第二个 1
+            if (cw.first < encoding_size) {
+                cw_query.at(base_idx + cw.first).at(slot_idx) = 1;
+            }
             if (cw.second < encoding_size) {
-                uint32_t q_idx2 = cw.second * bundle_size + bundle_idx;
-                cw_query.at(q_idx2).at(slot_idx) = 1;
+                cw_query.at(base_idx + cw.second).at(slot_idx) = 1;
             }
         }
       }
   }
 
-  // 4. 加密发送
+  // 加密发送
   std::vector<seal::Ciphertext> query_cipher(query_ct_size);
   for (uint32_t i = 0; i < query_ct_size; i++) {
     seal::Plaintext pt;
     _batch_encoder->encode(cw_query[i], pt);
-    // 这里使用 encrypt_symmetric (对称加密) 还是 encrypt (公钥加密) 取决于你的需求
-    // 原生代码通常用 symmetric 以减小查询大小
     send_size += _encryptor->encrypt_symmetric(pt).save(query_stream);
   }
-  
-  // 打印调试信息，确认生成大小
-  // std::cout << "  Query generated. Total size: " << send_size << " bytes." << std::endl;
-
   return query_stream;
 }
 
@@ -241,75 +221,6 @@ std::vector<std::vector<uint64_t>> Client::extract_batch_answer(
     assert(_decryptor->invariant_noise_budget(response[i]) != 0);
   }
   return answer;
-}
-
-// ===== 自己实现: 跳过Cuckoo Hash的batch query生成 =====
-// 参考原始的gen_batch_query，但不使用Cuckoo Hash，直接用传入的索引
-std::stringstream Client::gen_direct_batch_query_no_cuckoo(
-    const std::vector<uint32_t> &direct_indices) {
-  
-  bool is_compress = _pir_parms.get_is_compress();
-  std::stringstream query_stream;
-  uint64_t query_size = direct_indices.size();
-  
-  // **关键区别**: 这里不做 cuckoo_table->insert()，直接使用传入的索引
-  
-  auto encoding_size = _pir_parms.get_encoding_size();
-  auto bundle_size = _pir_parms.get_bundle_size();
-  auto query_ct_size = encoding_size * bundle_size;
-  
-  std::vector<std::vector<uint64_t>> cw_query(query_ct_size,
-                                              std::vector<uint64_t>(_N, 0));
-  
-  if (is_compress == false) {
-    // 不压缩模式: 参考gen_batch_query的逻辑
-    for (auto idx : direct_indices) {
-      // **关键区别**: 不通过cuckoo_table->query()，直接用idx作为位置
-      auto loc = idx;  // 数据库中的物理位置
-      
-      // 使用PIRANA的codeword机制 (k-out-of-n编码)
-      // **修正**: 直接用loc计算codeword，而不是通过hash map查询
-      auto cw = get_cw_code_k2(loc, encoding_size);
-      
-      // 在查询向量中设置对应的位
-      // 原逻辑: cw_query[cw.first * bundle_size + loc / _N][loc % _N] = 1;
-      cw_query[cw.first * bundle_size + loc / _N][loc % _N] = 1;
-      cw_query[cw.second * bundle_size + loc / _N][loc % _N] = 1;
-    }
-    
-    // 加密所有查询向量
-    std::vector<seal::Ciphertext> query_cipher(query_ct_size);
-    for (uint32_t i = 0; i < query_ct_size; i++) {
-      seal::Plaintext pt;
-      _batch_encoder->encode(cw_query[i], pt);
-      _encryptor->encrypt_symmetric(pt).save(query_stream);
-    }
-    
-  } else {
-    // 压缩模式
-    assert(bundle_size == 1);
-    auto num_slot = _pir_parms.get_num_slot();
-    
-    for (auto idx : direct_indices) {
-      auto loc = idx;
-      auto cw = get_cw_code_k2(loc, encoding_size);
-      
-      for (uint32_t slot = 0; slot < num_slot; slot++) {
-        auto slot_index = loc * num_slot + slot;
-        cw_query.at(cw.first).at(slot_index) = 1;
-        cw_query.at(cw.second).at(slot_index) = 1;
-      }
-    }
-    
-    std::vector<seal::Ciphertext> query_cipher(query_ct_size);
-    for (uint32_t i = 0; i < query_ct_size; i++) {
-      seal::Plaintext pt;
-      _batch_encoder->encode(cw_query[i], pt);
-      _encryptor->encrypt_symmetric(pt).save(query_stream);
-    }
-  }
-  
-  return query_stream;
 }
 
 // 提取直接批量查询的答案（对应gen_direct_batch_query_no_cuckoo）

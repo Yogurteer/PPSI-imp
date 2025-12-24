@@ -506,54 +506,6 @@ void Server::batch_encode_to_ntt_db_with_compress() {
   }
 }
 
-// // used for batch encode
-// void Server::batch_encode_to_ntt_db_with_compress() {
-//   assert(_pir_parms.get_is_compress() == true &&
-//          "Wrong call! only used when compress is true!");
-//   assert(_pir_parms.get_bundle_size() == 1 &&
-//          "Compress is useful only when the bundle size is 1");
-//   assert(_set_db && "Database has not been loaded correctly!");
-//   std::cout << "Encode database now!" << std::endl;
-//   auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
-//   auto db_pt_size = _pir_parms.get_col_size() * compress_num_slot;
-//   auto table_size = _pir_parms.get_table_size();
-//   uint32_t num_slot = _pir_parms.get_num_slot();
-//   // (col_size, num_slot)
-//   auto table = _pir_parms.get_cuckoo_table();
-//   auto bucket = _pir_parms.get_bucket();
-
-//   _encoded_db.resize(db_pt_size);
-
-//   std::vector<uint64_t> plain_vector(_N, 0);
-//   for (uint64_t pl_slot_index = 0; pl_slot_index < compress_num_slot;
-//        pl_slot_index++) {
-//     for (uint64_t col_index = 0; col_index < _pir_parms.get_col_size();
-//          col_index++) {
-//       seal::Plaintext encoded_plain;
-//       for (uint32_t i = 0; i < table_size; i++) {
-//         for (uint32_t slot = 0; slot < num_slot; slot++) {
-//           if (col_index < bucket.at(i).size() &&
-//               (pl_slot_index * num_slot + slot) <
-//                   _pir_parms.get_num_payload_slot()) {
-//             auto index = bucket.at(i).at(col_index);
-//             plain_vector.at(i * num_slot + slot) =
-//                 _raw_db.at(index).at(pl_slot_index * num_slot + slot);
-//           } else {
-//             // Dummy slot can't be 0
-//             // If bundle size >= 2, then there will be ALL zeros plaintext;
-//             plain_vector.at(i * num_slot + slot) = 1;
-//           }
-//         }
-//       }
-//       _batch_encoder->encode(plain_vector, encoded_plain);
-//       _evaluator->transform_to_ntt_inplace(encoded_plain,
-//                                            _context->first_parms_id());
-//       _encoded_db.at(pl_slot_index * _pir_parms.get_col_size() + col_index) =
-//           encoded_plain;
-//     }
-//   }
-// }
-
 std::vector<seal::Ciphertext> Server::load_query(
     std::stringstream &query_stream, uint32_t query_ct_size) {
   std::vector<seal::Ciphertext> query(query_ct_size);
@@ -901,22 +853,79 @@ std::stringstream Server::gen_batch_response(std::stringstream &query_stream) {
 };
 
 std::stringstream Server::gen_direct_batch_response_no_cuckoo(std::stringstream &query_stream) {
-  std::cout << "Server: Generating Direct Batch Response (Native Logic)..." << std::endl;
+  std::cout << "Server: Generating Direct Batch Response (Slice & Process)..." << std::endl;
 
-  // 1. 加载查询 (完全复用原生 load_query)
-  // Client 发送的查询大小是 m * bundle_size
-  std::vector<seal::Ciphertext> query = 
-      load_query(query_stream, 
-                 _pir_parms.get_encoding_size() * _pir_parms.get_bundle_size());
+  auto bundle_size = _pir_parms.get_bundle_size();
+  auto encoding_size = _pir_parms.get_encoding_size(); 
+  auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
+  auto col_size = _pir_parms.get_col_size();
 
-  // 2. 生成选择向量 (完全复用原生 gen_selection_vector_batch)
-  // 这个函数内部处理了 k=2 的乘法匹配和 Relinearize，非常安全
-  std::vector<seal::Ciphertext> selection_vector = 
-      gen_selection_vector_batch(query);
+  // 1. 加载所有查询
+  // 大小: m * bundle_size
+  std::vector<seal::Ciphertext> all_queries = 
+      load_query(query_stream, encoding_size * bundle_size);
 
-  // 3. 计算内积 (调用我们即将 Patch 的 inner_product)
   std::stringstream response;
-  response = my_inner_product(selection_vector);
+
+  // 2. 遍历每一个 Bundle (独立处理)
+  for (uint32_t b = 0; b < bundle_size; b++) {
+      
+      // A. 从总查询中切分出当前 Bundle 的查询向量
+      // 范围: [b*m, (b+1)*m)
+      std::vector<seal::Ciphertext> sub_query;
+      sub_query.reserve(encoding_size);
+      
+      uint32_t start_idx = b * encoding_size;
+      for(uint32_t k=0; k<encoding_size; ++k) {
+          sub_query.push_back(all_queries[start_idx + k]);
+      }
+      
+      // B. 调用原生函数生成选择向量
+      // 这会处理 k=2, multiply, relinearize 等所有复杂逻辑
+      // 返回结果大小: col_size
+      std::vector<seal::Ciphertext> selection_vector = 
+          gen_selection_vector_batch(sub_query);
+
+      // C. 手动内积 (针对特定 Bundle 的 DB 数据)
+      // 这里的逻辑类似 inner_product，但我们需要锁定 bundle index = b
+      
+      // C1. 遍历 Payload 分片
+      for (uint64_t pl = 0; pl < compress_num_slot; pl++) {
+          
+          seal::Ciphertext sum;
+          bool first = true;
+          
+          // C2. 遍历列
+          for (uint64_t col = 0; col < col_size; col++) {
+              
+              // 这里的 selection_vector[col] 就是当前 Bundle 的第 col 列的选择信号
+              
+              // 获取 DB 中对应位置的数据
+              // DB Layout: [Payload][Col][Bundle]
+              uint64_t db_idx = (pl * col_size * bundle_size) + (col * bundle_size) + b;
+              
+              seal::Ciphertext prod;
+              // 此时 selection_vector 是密文(NTT), _encoded_db 是明文(NTT)
+              // 安全乘法
+              _evaluator->multiply_plain(selection_vector[col], _encoded_db[db_idx], prod);
+              
+              if (first) {
+                  sum = prod;
+                  first = false;
+              } else {
+                  _evaluator->add_inplace(sum, prod);
+              }
+          }
+          
+          // D. 后处理
+          _evaluator->transform_from_ntt_inplace(sum);
+          while (sum.parms_id() != _context->last_parms_id()) {
+               _evaluator->mod_switch_to_next_inplace(sum);
+          }
+          
+          sum.save(response);
+      }
+  }
   
   return response;
 }

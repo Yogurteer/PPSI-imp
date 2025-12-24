@@ -21,6 +21,8 @@ class Client {
   Client(PirParms &pir_parms);
   std::stringstream gen_query(uint32_t index);
   std::stringstream gen_batch_query(const std::vector<uint32_t> &batch_query);
+  std::stringstream gen_direct_batch_query(const std::vector<uint32_t> &direct_indices);
+  
   std::stringstream save_keys() {
     std::stringstream keys;
     _galois_keys.save(keys);
@@ -32,13 +34,6 @@ class Client {
       std::stringstream &responsestream);
   std::vector<std::vector<uint64_t>> extract_batch_answer(
       std::stringstream &responsestream);
-
-  // ===== 新增: 为LPSI协议提供的直接查询接口（跳过Cuckoo Hash） =====
-  // 生成批量查询，直接使用传入的数据库索引，不经过Cuckoo Hash预处理
-  // direct_indices: 直接的数据库索引数组 [idx0, idx1, ...]
-  // 注意: 这个函数期望数据库已经按我们的方式组织好，索引是最终的物理位置
-  std::stringstream gen_direct_batch_query_no_cuckoo(
-      const std::vector<uint32_t> &direct_indices);
   
   // 提取直接批量查询的结果（对应gen_direct_batch_query_no_cuckoo）
   std::vector<std::vector<uint64_t>> extract_direct_batch_answer_no_cuckoo(
@@ -51,7 +46,7 @@ class Client {
     return sk_stream;
   }
 
-  std::stringstream gen_direct_batch_query(const std::vector<uint32_t> &direct_indices);
+  
 
   ~Client();
 };
