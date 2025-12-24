@@ -838,56 +838,64 @@ std::stringstream Server::gen_batch_response(std::stringstream &query_stream) {
   return response;
 };
 
-// ===== 自己实现: 对应gen_direct_batch_query_no_cuckoo的响应生成 =====
-std::stringstream Server::gen_direct_batch_response_no_cuckoo(std::stringstream &query) {
+std::stringstream Server::gen_direct_batch_response_no_cuckoo(std::stringstream &query_stream) {
   std::cout << "Server: Generating Direct Batch Response (Multi-Bundle)..." << std::endl;
 
   auto bundle_size = _pir_parms.get_bundle_size();
-  auto encoding_size = _pir_parms.get_encoding_size();
+  auto encoding_size = _pir_parms.get_encoding_size(); // m
   auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
   auto col_size = _pir_parms.get_col_size();
 
-  // 1. 读取查询密文
-  // 现在的查询数量是 encoding_size * bundle_size
-  std::vector<seal::Ciphertext> query_ct(encoding_size * bundle_size);
-  for (size_t i = 0; i < query_ct.size(); i++) {
-    query_ct[i].load(*_context, query);
-    _evaluator->transform_to_ntt_inplace(query_ct[i]); // 记得 NTT
+  // 1. 加载查询密文
+  // 注意：load_query 只是反序列化，得到的密文通常处于 Coeff 域
+  std::vector<seal::Ciphertext> query = 
+      load_query(query_stream, encoding_size * bundle_size);
+
+  // 【核心修复 1】确保所有查询密文都转换为 NTT 域
+  // 因为数据库 (_encoded_db) 已经在 Encode 阶段转为 NTT 了，乘法必须同域
+  for (auto &ct : query) {
+      if (!ct.is_ntt_form()) {
+          _evaluator->transform_to_ntt_inplace(ct);
+      }
   }
 
-  std::stringstream output;
-  
-  // 2. 计算响应
-  // 遍历每一个 Payload 分片
+  std::stringstream response;
+
+  // 2. 执行内积运算 (Inner Product)
   for (uint64_t pl = 0; pl < compress_num_slot; pl++) {
       
-      // 【核心修改】遍历每一个 Bundle
-      // 我们需要为每个 Bundle 单独生成响应
       for (uint32_t b = 0; b < bundle_size; b++) {
           
           seal::Ciphertext sum;
           bool first = true;
 
-          // 遍历列 (Codeword bits)
           for (uint64_t col = 0; col < col_size; col++) {
-               // 获取该列对应的码字位 (j1, j2)
+               // A. 重组查询向量
                auto cw = get_cw_code_k2(col, encoding_size);
                
-               // 我们需要 Query 的 (j1, b) 和 (j2, b) 部分
                uint32_t q_idx1 = cw.first * bundle_size + b;
                uint32_t q_idx2 = cw.second * bundle_size + b;
                
-               // 获取 DB 的 (pl, col, b) 部分
-               // DB Index = (pl * col_size * bundle_size) + (col * bundle_size) + b
+               // B. 密文相加 (Query Reconstruction)
+               // 在 NTT 域中相加，结果 q_sum 依然保持 NTT 状态
+               seal::Ciphertext q_sum;
+               _evaluator->add(query[q_idx1], query[q_idx2], q_sum);
+               
+               // C. 计算数据库索引
                uint64_t db_idx = (pl * col_size * bundle_size) + (col * bundle_size) + b;
                
-               // 计算: DB * (Query1 + Query2)
-               // 因为 Query1 和 Query2 对应同一个列 col 的选择信号
-               seal::Ciphertext q_sum;
-               _evaluator->add(query_ct[q_idx1], query_ct[q_idx2], q_sum);
-               
+               // D. 乘法累加 (Ciphertext * Plaintext)
+               // 【关键验证】：此时 q_sum 是 NTT，_encoded_db 是 NTT，可以直接乘
                seal::Ciphertext prod;
-               _evaluator->multiply(q_sum, _encoded_db[db_idx], prod); // DB 已经是 NTT 域
+               try {
+                   _evaluator->multiply_plain(q_sum, _encoded_db[db_idx], prod); 
+               } catch (const std::exception& e) {
+                   // 假如万一报错，打印调试信息
+                   std::cerr << "Error in multiply_plain at pl=" << pl 
+                             << ", b=" << b << ", col=" << col << std::endl;
+                   std::cerr << "q_sum is_ntt: " << q_sum.is_ntt_form() << std::endl;
+                   throw;
+               }
                
                if (first) {
                    sum = prod;
@@ -897,20 +905,22 @@ std::stringstream Server::gen_direct_batch_response_no_cuckoo(std::stringstream 
                }
           }
           
-          // 转换回普通域并保存
+          // 3. 后处理：转回系数域
+          // 只有转回系数域才能进行 ModSwitch 和保存
           _evaluator->transform_from_ntt_inplace(sum);
           
-          // 消除噪声预算过大的风险 (ModSwitch)
-          // 这一步对于 N=8192 非常重要，防止后续计算出错
-          // 如果你的代码里有这一步最好，没有的话加上
+          // 降噪处理 (ModSwitch)
+          // 确保降到最后一层，减小密文大小
           while (sum.parms_id() != _context->last_parms_id()) {
                _evaluator->mod_switch_to_next_inplace(sum);
           }
 
-          sum.save(output);
+          // 4. 保存响应
+          sum.save(response);
       }
   }
-  return output;
+  
+  return response;
 }
 
 // ===== 旧的直接响应接口（可以删除或保留） =====
