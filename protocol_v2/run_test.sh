@@ -28,7 +28,7 @@ cd build
 
 # 运行CMake (静默模式)
 echo -e "${GREEN}运行CMake配置...${NC}"
-cmake .. -DCMAKE_BUILD_TYPE=Debug > /dev/null 2>&1
+cmake .. > /dev/null 2>&1
 # cmake .. -DCMAKE_BUILD_TYPE=Release > /dev/null 2>&1
 
 if [ $? -ne 0 ]; then
@@ -55,8 +55,8 @@ echo -e "${BLUE}  run${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
-# ./bin/lpsi_test -x 4096 -y 256 -p 1
-./bin/lpsi_test -x 1048576 -y 128 -p 1
+./bin/lpsi_test -x 4096 -y 512 -p 1
+# ./bin/lpsi_test -x 256 -y 64 -p 1
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}程序运行失败!${NC}"

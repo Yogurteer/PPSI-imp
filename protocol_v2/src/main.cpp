@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <getopt.h> // 用于命令行参数解析
+#include <memory>
 
 using namespace std;
 using namespace std::chrono;
@@ -159,7 +160,8 @@ std::vector<Element> run_batch_pir(
     size_t num_rows,
     size_t row_size,
     size_t payload_size,
-    double &online_time) {
+    double &online_time,
+    std::string batch_PIR_mode) {
     
     std::vector<Element> results;
     
@@ -174,11 +176,21 @@ std::vector<Element> run_batch_pir(
     // 目的是获取正确的 plain_modulus_bit 和 num_payload_slot
     // num_query 对应 PIR 矩阵的行数 (子桶数)
     // row_size 对应 PIR 矩阵的列数 (子桶容量)
-    std::cout << "构造 Direct Mode PirParms (用于预处理参数计算)..." << std::endl;
-    PirParms temp_pir_parms(num_payloads, payload_size, num_query, row_size);
+    std::unique_ptr<PirParms> temp_pir_parms;
+    if (batch_PIR_mode == "direct") {
+        is_compress = true; // Direct Mode 默认开启压缩
+        std::cout << "构造 Direct Mode PirParms (用于预处理参数计算)..." << std::endl;
+        temp_pir_parms = std::make_unique<PirParms>(num_payloads, payload_size, num_query, row_size);
+    }
+    else if (batch_PIR_mode == "default") {
+        std::cout << "构造 Default Mode PirParms (用于预处理参数计算)..." << std::endl;
+        temp_pir_parms = std::make_unique<PirParms>(num_payloads, payload_size, num_query, is_batch, is_compress);
+    } else {
+        throw std::runtime_error("未知的 Batch PIR 模式: " + batch_PIR_mode);
+    }
 
-    auto plain_modulus_bit = temp_pir_parms.get_seal_parms().plain_modulus().bit_count();
-    auto expected_num_payload_slot = temp_pir_parms.get_num_payload_slot();
+    auto plain_modulus_bit = temp_pir_parms->get_seal_parms().plain_modulus().bit_count();
+    auto expected_num_payload_slot = temp_pir_parms->get_num_payload_slot();
     
     std::cout << "\n[数据预处理] payload_size=" << payload_size << " bytes" << std::endl;
     std::cout << "[数据预处理] plain_modulus_bit=" << plain_modulus_bit << std::endl;
@@ -189,6 +201,7 @@ std::vector<Element> run_batch_pir(
     // 将 Element (字节向量) 转换为 uint64_t 向量
     std::vector<std::vector<uint64_t>> input_db(num_payloads);
     
+    // prepare input_db via temp_pir_parms
     for (size_t i = 0; i < num_payloads; ++i) {
         const auto& elem = database_items[i];
         
@@ -231,11 +244,19 @@ std::vector<Element> run_batch_pir(
     // 【关键修改 2】调用新的 Direct Batch PIR 函数
     // 注意：你需要确保 batch_pir.cc 中的 my_direct_batch_pir_main 定义中增加了 col_size 参数
     // 这里的 row_size 就是子桶容量，对应 PIR 中的 col_size
-    results = my_direct_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
-                   is_compress, input_db, query_indices, row_size, online_time);
+    // results = my_direct_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
+    //                is_compress, input_db, query_indices, row_size, online_time);
     // 能正常运行的非紧凑Batch PIR调用 
-    // results = my_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
-    //                is_compress, input_db, query_indices, online_time);
+    if(batch_PIR_mode == "direct")
+    {
+        results = my_direct_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
+                       is_compress, input_db, query_indices, row_size, online_time);
+    }
+    else // default mode
+    {
+        results = my_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
+                       is_compress, input_db, query_indices, online_time);
+    }
                    
     return results;
 }
@@ -445,7 +466,8 @@ void phase4_execute_pir(
     const std::vector<Element>& database,
     const std::vector<uint32_t>& queries,
     size_t item_size,
-    double &online_time) {
+    double &online_time,
+    std::string batch_PIR_mode) {
     
     // 获取数据库的行列结构
     size_t sender_num_main_buckets = sender.get_num_main_buckets();
@@ -455,7 +477,7 @@ void phase4_execute_pir(
 
     std::cout << "---------------Call Batch PIR-----------------------" << std::endl;
     
-    std::vector<Element> pir_results = run_batch_pir(database, queries, num_rows, row_size, item_size, online_time);
+    std::vector<Element> pir_results = run_batch_pir(database, queries, num_rows, row_size, item_size, online_time, batch_PIR_mode);
 
     receiver.pir_results = pir_results;
     
@@ -610,7 +632,7 @@ void global_set_up() {
     
 }
 
-int run_main(size_t sender_size, size_t receiver_size, size_t payload_size) {
+int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std::string batch_PIR_mode) {
     std::cout << "========================================" << std::endl;
     std::cout << "   Payable LPSI协议 (动态参数分段计时)" << std::endl;
     std::cout << "========================================" << std::endl;
@@ -662,7 +684,7 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size) {
     phase3_prepare_pir(sender, receiver, database, queries, pir_db_size, item_size);
     // 执行PIR (Cryptographic operations)
     double batch_pir_online_time = 0.0;
-    phase4_execute_pir(receiver, sender, database, queries, item_size, batch_pir_online_time);
+    phase4_execute_pir(receiver, sender, database, queries, item_size, batch_pir_online_time, batch_PIR_mode);
     auto dur_pir = batch_pir_online_time; // 转换为毫秒
     
     // --- 模拟PIR与验证 (不计入时间) ---
@@ -761,6 +783,7 @@ int main(int argc, char** argv) {
     size_t sender_size = 4096;   // 默认 2^12
     size_t receiver_size = 256;  // 默认 2^8
     size_t payload_size = 1;     // 默认 1 byte
+    
 
     int opt;
     while ((opt = getopt(argc, argv, "x:y:p:h")) != -1) {
@@ -793,7 +816,12 @@ int main(int argc, char** argv) {
     }
 
     // 运行主逻辑
-    run_main(sender_size, receiver_size, payload_size);
+    std::string batch_PIR_mode = "direct"; // "default" or "direct"
+    if (receiver_size == 1) {
+        batch_PIR_mode = "default"; // 单元素查询使用默认模式
+    }
+    // batch_PIR_mode = "default"; 
+    run_main(sender_size, receiver_size, payload_size, batch_PIR_mode);
     
     return 0;
 }

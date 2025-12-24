@@ -7,6 +7,10 @@
 // ========================================
 //  可支付LPSI协议配置参数
 // ========================================
+namespace PIR {
+    const uint64_t default_poly_degree = 8192;
+    
+}
 
 namespace LPSIConfig {
     // ===== 哈希桶配置 =====
