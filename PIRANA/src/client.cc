@@ -66,12 +66,7 @@ std::stringstream Client::gen_direct_batch_query(
         uint32_t slot_idx = absolute_pos % _N;
 
         // 边界检查：确保不超出分配的 Bundle 范围
-        if (bundle_idx < bundle_size) {
-            
-            // (C) 填写查询向量
-            // 我们需要设置两个位置为 1 (因为 Hamming Weight k=2)
-            // 索引计算公式: Codeword_Index * bundle_size + Bundle_Index
-            
+        if (bundle_idx < bundle_size) {            
             // 设置第一个 1
             if (cw.first < encoding_size) {
                 uint32_t q_idx1 = cw.first * bundle_size + bundle_idx;

@@ -64,6 +64,9 @@ class Server {
 
   std::stringstream inner_product(
       const std::vector<seal::Ciphertext> &selection_vector);
+  
+  std::stringstream my_inner_product(
+    const std::vector<seal::Ciphertext> &selection_vector);
 
   std::stringstream gen_response(std::stringstream &query);
 
@@ -72,9 +75,6 @@ class Server {
   // ===== 新增: 为LPSI协议提供的直接响应接口（跳过Cuckoo Hash） =====
   // 处理批量查询（对应gen_direct_batch_query_no_cuckoo）
   std::stringstream gen_direct_batch_response_no_cuckoo(std::stringstream &query_stream);
-  
-  // 旧的实现（保留向后兼容）
-  std::stringstream gen_direct_batch_response(std::stringstream &query_stream, uint32_t num_queries);
 
   void set_keys(std::stringstream &keys) {
     _galois_keys.load(*_context, keys);

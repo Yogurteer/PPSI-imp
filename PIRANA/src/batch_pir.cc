@@ -294,6 +294,7 @@ std::vector<Element> my_direct_batch_pir_main(
   // 4. 生成响应
   timer.reset();
   std::stringstream response = batch_server.gen_direct_batch_response_no_cuckoo(query);
+  // std::stringstream response = batch_server.gen_batch_response(query);
   auto response_time = timer.elapsed();
 
   // 5. 提取结果 (得到 slots 形式)

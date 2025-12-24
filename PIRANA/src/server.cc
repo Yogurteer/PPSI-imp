@@ -808,6 +808,68 @@ std::stringstream Server::inner_product(
   return result;
 }
 
+std::stringstream Server::my_inner_product(
+    const std::vector<seal::Ciphertext> &selection_vector) {
+    
+  std::cout << "Server: Executing Inner Product..." << std::endl;
+  
+  auto bundle_size = _pir_parms.get_bundle_size();
+  auto col_size = _pir_parms.get_col_size();
+  auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
+  std::stringstream response;
+
+  // 遍历 Payload 分片
+  for (uint64_t pl = 0; pl < compress_num_slot; pl++) {
+      
+      // 遍历每一个 Bundle (这是为了支持 Direct Mode 大规模数据的核心循环)
+      for (uint32_t b = 0; b < bundle_size; b++) {
+          
+          seal::Ciphertext sum;
+          bool first = true;
+
+          // 遍历每一列 (Column)
+          for (uint64_t col = 0; col < col_size; col++) {
+              
+              // 1. 获取对应的选择向量
+              // Selection Vector Layout: [Col0_B0, Col0_B1...], [Col1_B0...]
+              // 这与我们 gen_selection_vector_batch 的输出是一致的
+              uint64_t sel_idx = col * bundle_size + b;
+              
+              // 2. 获取对应的数据库分片
+              // Encoded DB Layout: [Payload][Col][Bundle]
+              // 这与我们在 batch_encode...with_compress 中写的顺序是一致的
+              uint64_t db_idx = (pl * col_size * bundle_size) + (col * bundle_size) + b;
+
+              // 3. 乘法累加 (Ciphertext * Plaintext)
+              seal::Ciphertext prod;
+              
+              // 原生 gen_selection_vector_batch 生成的是 NTT 形式的密文
+              // 我们的 _encoded_db 也是 NTT 形式的明文
+              // 所以直接 multiply_plain 是安全的！
+              _evaluator->multiply_plain(selection_vector[sel_idx], _encoded_db[db_idx], prod);
+
+              if (first) {
+                  sum = prod;
+                  first = false;
+              } else {
+                  _evaluator->add_inplace(sum, prod);
+              }
+          }
+
+          // 4. 后处理：转回系数域并降噪
+          _evaluator->transform_from_ntt_inplace(sum);
+          
+          // 确保降噪到最后一层 (适配 Client 的解密预期)
+          while (sum.parms_id() != _context->last_parms_id()) {
+               _evaluator->mod_switch_to_next_inplace(sum);
+          }
+
+          sum.save(response);
+      }
+  }
+  return response;
+}
+
 std::stringstream Server::gen_response(std::stringstream &query_stream) {
   std::stringstream response;
   std::vector<seal::Ciphertext> query =
@@ -839,118 +901,22 @@ std::stringstream Server::gen_batch_response(std::stringstream &query_stream) {
 };
 
 std::stringstream Server::gen_direct_batch_response_no_cuckoo(std::stringstream &query_stream) {
-  std::cout << "Server: Generating Direct Batch Response (Multi-Bundle)..." << std::endl;
+  std::cout << "Server: Generating Direct Batch Response (Native Logic)..." << std::endl;
 
-  auto bundle_size = _pir_parms.get_bundle_size();
-  auto encoding_size = _pir_parms.get_encoding_size(); // m
-  auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
-  auto col_size = _pir_parms.get_col_size();
-
-  // 1. 加载查询密文
-  // 注意：load_query 只是反序列化，得到的密文通常处于 Coeff 域
+  // 1. 加载查询 (完全复用原生 load_query)
+  // Client 发送的查询大小是 m * bundle_size
   std::vector<seal::Ciphertext> query = 
-      load_query(query_stream, encoding_size * bundle_size);
+      load_query(query_stream, 
+                 _pir_parms.get_encoding_size() * _pir_parms.get_bundle_size());
 
-  // 【核心修复 1】确保所有查询密文都转换为 NTT 域
-  // 因为数据库 (_encoded_db) 已经在 Encode 阶段转为 NTT 了，乘法必须同域
-  for (auto &ct : query) {
-      if (!ct.is_ntt_form()) {
-          _evaluator->transform_to_ntt_inplace(ct);
-      }
-  }
+  // 2. 生成选择向量 (完全复用原生 gen_selection_vector_batch)
+  // 这个函数内部处理了 k=2 的乘法匹配和 Relinearize，非常安全
+  std::vector<seal::Ciphertext> selection_vector = 
+      gen_selection_vector_batch(query);
 
+  // 3. 计算内积 (调用我们即将 Patch 的 inner_product)
   std::stringstream response;
-
-  // 2. 执行内积运算 (Inner Product)
-  for (uint64_t pl = 0; pl < compress_num_slot; pl++) {
-      
-      for (uint32_t b = 0; b < bundle_size; b++) {
-          
-          seal::Ciphertext sum;
-          bool first = true;
-
-          for (uint64_t col = 0; col < col_size; col++) {
-               // A. 重组查询向量
-               auto cw = get_cw_code_k2(col, encoding_size);
-               
-               uint32_t q_idx1 = cw.first * bundle_size + b;
-               uint32_t q_idx2 = cw.second * bundle_size + b;
-               
-               // B. 密文相加 (Query Reconstruction)
-               // 在 NTT 域中相加，结果 q_sum 依然保持 NTT 状态
-               seal::Ciphertext q_sum;
-               _evaluator->add(query[q_idx1], query[q_idx2], q_sum);
-               
-               // C. 计算数据库索引
-               uint64_t db_idx = (pl * col_size * bundle_size) + (col * bundle_size) + b;
-               
-               // D. 乘法累加 (Ciphertext * Plaintext)
-               // 【关键验证】：此时 q_sum 是 NTT，_encoded_db 是 NTT，可以直接乘
-               seal::Ciphertext prod;
-               try {
-                   _evaluator->multiply_plain(q_sum, _encoded_db[db_idx], prod); 
-               } catch (const std::exception& e) {
-                   // 假如万一报错，打印调试信息
-                   std::cerr << "Error in multiply_plain at pl=" << pl 
-                             << ", b=" << b << ", col=" << col << std::endl;
-                   std::cerr << "q_sum is_ntt: " << q_sum.is_ntt_form() << std::endl;
-                   throw;
-               }
-               
-               if (first) {
-                   sum = prod;
-                   first = false;
-               } else {
-                   _evaluator->add_inplace(sum, prod);
-               }
-          }
-          
-          // 3. 后处理：转回系数域
-          // 只有转回系数域才能进行 ModSwitch 和保存
-          _evaluator->transform_from_ntt_inplace(sum);
-          
-          // 降噪处理 (ModSwitch)
-          // 确保降到最后一层，减小密文大小
-          while (sum.parms_id() != _context->last_parms_id()) {
-               _evaluator->mod_switch_to_next_inplace(sum);
-          }
-
-          // 4. 保存响应
-          sum.save(response);
-      }
-  }
-  
-  return response;
-}
-
-// ===== 旧的直接响应接口（可以删除或保留） =====
-std::stringstream Server::gen_direct_batch_response(
-    std::stringstream &query_stream, uint32_t num_queries) {
-  
-  std::stringstream response;
-  auto encoding_size = _pir_parms.get_encoding_size();
-  
-  // 对每个查询独立处理
-  for (uint32_t q = 0; q < num_queries; ++q) {
-    // 加载一个查询（encoding_size 个密文）
-    std::vector<seal::Ciphertext> query = load_query(query_stream, encoding_size);
-    
-    // 生成选择向量
-    std::vector<seal::Ciphertext> selection_vector = gen_selection_vector(query);
-    
-    // 旋转选择向量
-    std::vector<seal::Ciphertext> rotated_selection_vectors = 
-        rotate_selection_vector(selection_vector);
-    
-    // 与数据库相乘
-    std::vector<seal::Ciphertext> response_cipher = 
-        mul_database_with_compress(rotated_selection_vectors);
-    
-    // 保存响应
-    for (auto &r : response_cipher) {
-      r.save(response);
-    }
-  }
+  response = my_inner_product(selection_vector);
   
   return response;
 }
