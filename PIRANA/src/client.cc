@@ -22,58 +22,83 @@ Client::Client(/* args */ PirParms &pir_parms) : _pir_parms(pir_parms) {
 std::stringstream Client::gen_direct_batch_query(
     const std::vector<uint32_t> &direct_indices) {
     
+  std::cout << "Client: Generating Direct Batch Query (Multi-Bundle)..." << std::endl;
   std::stringstream query_stream;
   uint64_t send_size = 0;
   
-  // 参数检查
+  // 1. 获取参数
   assert(direct_indices.size() == _pir_parms.get_num_query());
 
-  auto encoding_size = _pir_parms.get_encoding_size();
-  auto bundle_size = _pir_parms.get_bundle_size(); // 通常为1
+  auto encoding_size = _pir_parms.get_encoding_size(); // m
+  auto bundle_size = _pir_parms.get_bundle_size();     // Bundle 数量 (例如 2)
+  auto num_slot = _pir_parms.get_num_slot();           // 步长 (例如 1 或 256)
+  
+  // 总的查询密文数量 = m * bundle_size
+  // 逻辑结构: [Col0_B0, Col0_B1...], [Col1_B0, Col1_B1...]
   auto query_ct_size = encoding_size * bundle_size;
   
-  // 初始化查询矩阵 (全0)
-  // 维度: [m] * [N]
+  // 2. 初始化查询矩阵 (全0)
+  // 外层维度: query_ct_size
+  // 内层维度: N (4096 or 8192)
   std::vector<std::vector<uint64_t>> cw_query(query_ct_size,
                                               std::vector<uint64_t>(_N, 0));
 
-  auto num_slot = _pir_parms.get_num_slot();
-
-  // 核心逻辑：直接映射
-  // direct_indices[i] 是第 i 个子桶中目标元素的 offset (0 ~ col_size-1)
-  // i 是第 i 个子桶的索引 (0 ~ num_query-1)
-  
+  // 3. 核心逻辑：填充查询向量
+  // 遍历每一个查询 (即每一行)
   for (uint32_t i = 0; i < direct_indices.size(); ++i) {
-      uint32_t offset = direct_indices[i]; // 这里的 offset 就是列索引 (col index)
+      uint32_t offset = direct_indices[i]; // 这一行想要查的列号 (0 ~ col_size-1)
+      uint32_t loc = i;                    // 这一行在 Table 中的逻辑行号 (Query ID)
       
-      // 1. 获取 Codeword (对应列)
-      // 在 Direct 模式下，input index 直接决定 Codeword
+      // (A) 获取 Codeword (对应列选择信号)
+      // 返回 pair<index1, index2>，表示这一列由哪两个 m 向量组成
       auto cw = get_cw_code_k2(offset, encoding_size);
 
-      // 2. 设置对应的槽位 (Row Index -> Slot Position)
-      // 在 PIRANA Batch 中，不同的 Query 被打包在同一个密文的不同 Slot 中
-      // Slot 的位置由 'loc' 决定，这里 'loc' 就是 i (第几个查询)
-      uint32_t loc = i; 
-      
+      // (B) 确定物理位置 (Bundle + Slot)
+      // 遍历 num_slot，将 1 填入连续的 num_slot 个位置中
       for (uint32_t slot = 0; slot < num_slot; slot++) {
-        // 计算在密文多项式中的具体系数位置
-        // 注意：这里假设 _table_size (即 num_query) <= N / num_slot
-        auto slot_index = loc * num_slot + slot;
         
-        if (slot_index < _N) {
-            cw_query.at(cw.first).at(slot_index) = 1;
-            cw_query.at(cw.second).at(slot_index) = 1;
+        // 计算绝对物理槽位索引 (Absolute Slot Index)
+        // 假设把所有 Bundle 首尾相连看作一个超长数组
+        uint64_t absolute_pos = (uint64_t)loc * num_slot + slot;
+        
+        // 分解为 Bundle Index 和 Slot Index
+        uint32_t bundle_idx = absolute_pos / _N;
+        uint32_t slot_idx = absolute_pos % _N;
+
+        // 边界检查：确保不超出分配的 Bundle 范围
+        if (bundle_idx < bundle_size) {
+            
+            // (C) 填写查询向量
+            // 我们需要设置两个位置为 1 (因为 Hamming Weight k=2)
+            // 索引计算公式: Codeword_Index * bundle_size + Bundle_Index
+            
+            // 设置第一个 1
+            if (cw.first < encoding_size) {
+                uint32_t q_idx1 = cw.first * bundle_size + bundle_idx;
+                cw_query.at(q_idx1).at(slot_idx) = 1;
+            }
+            
+            // 设置第二个 1
+            if (cw.second < encoding_size) {
+                uint32_t q_idx2 = cw.second * bundle_size + bundle_idx;
+                cw_query.at(q_idx2).at(slot_idx) = 1;
+            }
         }
       }
   }
 
-  // 加密发送
+  // 4. 加密发送
   std::vector<seal::Ciphertext> query_cipher(query_ct_size);
   for (uint32_t i = 0; i < query_ct_size; i++) {
     seal::Plaintext pt;
     _batch_encoder->encode(cw_query[i], pt);
+    // 这里使用 encrypt_symmetric (对称加密) 还是 encrypt (公钥加密) 取决于你的需求
+    // 原生代码通常用 symmetric 以减小查询大小
     send_size += _encryptor->encrypt_symmetric(pt).save(query_stream);
   }
+  
+  // 打印调试信息，确认生成大小
+  // std::cout << "  Query generated. Total size: " << send_size << " bytes." << std::endl;
 
   return query_stream;
 }

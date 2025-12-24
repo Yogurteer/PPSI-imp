@@ -839,19 +839,78 @@ std::stringstream Server::gen_batch_response(std::stringstream &query_stream) {
 };
 
 // ===== 自己实现: 对应gen_direct_batch_query_no_cuckoo的响应生成 =====
-std::stringstream Server::gen_direct_batch_response_no_cuckoo(
-    std::stringstream &query_stream) {
-  // 与gen_batch_response完全相同的逻辑
-  // 因为响应生成不需要知道查询是否经过了Cuckoo Hash
-  std::vector<seal::Ciphertext> query =
-      load_query(query_stream,
-                 _pir_parms.get_encoding_size() * _pir_parms.get_bundle_size());
+std::stringstream Server::gen_direct_batch_response_no_cuckoo(std::stringstream &query) {
+  std::cout << "Server: Generating Direct Batch Response (Multi-Bundle)..." << std::endl;
 
-  std::vector<seal::Ciphertext> selection_vector =
-      gen_selection_vector_batch(query);
-  std::stringstream response;
-  response = inner_product(selection_vector);
-  return response;
+  auto bundle_size = _pir_parms.get_bundle_size();
+  auto encoding_size = _pir_parms.get_encoding_size();
+  auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
+  auto col_size = _pir_parms.get_col_size();
+
+  // 1. 读取查询密文
+  // 现在的查询数量是 encoding_size * bundle_size
+  std::vector<seal::Ciphertext> query_ct(encoding_size * bundle_size);
+  for (size_t i = 0; i < query_ct.size(); i++) {
+    query_ct[i].load(*_context, query);
+    _evaluator->transform_to_ntt_inplace(query_ct[i]); // 记得 NTT
+  }
+
+  std::stringstream output;
+  
+  // 2. 计算响应
+  // 遍历每一个 Payload 分片
+  for (uint64_t pl = 0; pl < compress_num_slot; pl++) {
+      
+      // 【核心修改】遍历每一个 Bundle
+      // 我们需要为每个 Bundle 单独生成响应
+      for (uint32_t b = 0; b < bundle_size; b++) {
+          
+          seal::Ciphertext sum;
+          bool first = true;
+
+          // 遍历列 (Codeword bits)
+          for (uint64_t col = 0; col < col_size; col++) {
+               // 获取该列对应的码字位 (j1, j2)
+               auto cw = get_cw_code_k2(col, encoding_size);
+               
+               // 我们需要 Query 的 (j1, b) 和 (j2, b) 部分
+               uint32_t q_idx1 = cw.first * bundle_size + b;
+               uint32_t q_idx2 = cw.second * bundle_size + b;
+               
+               // 获取 DB 的 (pl, col, b) 部分
+               // DB Index = (pl * col_size * bundle_size) + (col * bundle_size) + b
+               uint64_t db_idx = (pl * col_size * bundle_size) + (col * bundle_size) + b;
+               
+               // 计算: DB * (Query1 + Query2)
+               // 因为 Query1 和 Query2 对应同一个列 col 的选择信号
+               seal::Ciphertext q_sum;
+               _evaluator->add(query_ct[q_idx1], query_ct[q_idx2], q_sum);
+               
+               seal::Ciphertext prod;
+               _evaluator->multiply(q_sum, _encoded_db[db_idx], prod); // DB 已经是 NTT 域
+               
+               if (first) {
+                   sum = prod;
+                   first = false;
+               } else {
+                   _evaluator->add_inplace(sum, prod);
+               }
+          }
+          
+          // 转换回普通域并保存
+          _evaluator->transform_from_ntt_inplace(sum);
+          
+          // 消除噪声预算过大的风险 (ModSwitch)
+          // 这一步对于 N=8192 非常重要，防止后续计算出错
+          // 如果你的代码里有这一步最好，没有的话加上
+          while (sum.parms_id() != _context->last_parms_id()) {
+               _evaluator->mod_switch_to_next_inplace(sum);
+          }
+
+          sum.save(output);
+      }
+  }
+  return output;
 }
 
 // ===== 旧的直接响应接口（可以删除或保留） =====
