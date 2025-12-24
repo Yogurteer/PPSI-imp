@@ -74,56 +74,6 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   print_pir_parms();
 }
 
-// PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
-//                    const uint64_t num_query, const uint64_t direct_col_size)
-//     : _num_payloads(num_payloads),
-//       _payload_size(payload_size),
-//       _num_query(num_query),
-//       _col_size(direct_col_size),
-//       _is_compress(false), // Direct模式通常配合压缩使用
-//       _enable_rotate(false) {
-
-//   // 1. 设置 SEAL 参数 (保持与原Batch相同或根据需要调整)
-//   // uint64_t poly_degree = 8192; // 之前建议的参数
-//   // std::vector<int> coeff_modulus = {56, 56, 24, 24};
-//   // 原始参数设置
-//   uint64_t poly_degree = 4096;
-//   std::vector<int> coeff_modulus = {48, 32, 24};
-
-//   uint64_t plain_prime_len = _is_compress? 18 : 17;
-//   set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
-
-//   // 2. 计算基本尺寸
-//   _num_payload_slot = std::ceil(payload_size * 8.0 / (plain_prime_len - 1));
-  
-//   // 3. 计算 Direct Mode 的维度
-//   // 在 Direct Mode 下，table_size 实际上就是总的物理行数
-//   // 即：ceil(num_payloads / col_size)
-//   // 但为了复用 PIRANA 逻辑，我们让 table_size = num_query (即总子桶数)
-//   uint32_t N = _seal_parms.poly_modulus_degree();
-  
-//   // 计算打包参数
-//   _num_slot = std::floor(N / num_query); 
-//   if (_num_slot == 0) _num_slot = 1; // 防止除0
-  
-//   _table_size = num_query; // 直接对应查询数量（子桶数）
-//   _bundle_size = 1;        // Direct模式通常设为1
-
-//   // 4. 计算 Encoding Size (m)
-//   // 这是 PIRANA 核心：k-out-of-m coding
-//   // col_size 是子桶容量，即每一行的元素个数
-//   _encoding_size = calculate_encoding_size(_col_size);
-
-//   std::cout << "Direct PIR Params: " << std::endl;
-//   std::cout << "  N: " << N << std::endl;
-//   std::cout << "  Col Size (Capacity): " << _col_size << std::endl;
-//   std::cout << "  Encoding Size (m): " << _encoding_size << std::endl;
-  
-//   // 关键：这里不再调用 get_all_index_hash_result (Skip Cuckoo)
-//   print_seal_parms();
-//   print_pir_parms();
-// }
-
 // 【修正后的 Direct Mode 构造函数】
 PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
                    const uint64_t num_query, const uint64_t direct_col_size)
@@ -150,26 +100,37 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   // 3. 设置 PIRANA 结构参数
   uint32_t N = _seal_parms.poly_modulus_degree();
 
-  if (num_query <= N) {
+  _table_size = num_query; // 桶的数量 = 查询数量 (行数)
+  // 【核心修复】计算需要的 Bundle 数量
+  // 如果行数超过 N，我们需要多个密文来承载
+  // 例如: 15360 / 8192 = 1.875 -> 需要 2 个 Bundle
+  _bundle_size = std::ceil((double)_table_size / N);
+
+  // 【核心修复】计算 Num Slot (步长)
+  if (_bundle_size > 1) {
+      // 如果使用了多个 Bundle，为了保证跨 Bundle 的对齐，强制 stride 为 1
+      // 这意味着:
+      // Row 0 -> Bundle 0, Slot 0
+      // Row 8192 -> Bundle 1, Slot 0
       _num_slot = 1; 
   } else {
-      _num_slot = std::floor(N / num_query); // Fallback
+      // 只有 1 个 Bundle 的情况 (小规模)
+      // 保持之前的逻辑: 如果极小则 compact，否则按比例对齐
+      if (num_query <= N) {
+          _num_slot = 1; 
+      } else {
+          // 这里其实不会执行，因为如果 num_query > N，bundle_size 就会 > 1
+          // 但为了逻辑完备保留 fallback
+           double ratio = (double)N / num_query;
+           uint32_t log2_ratio = 0;
+           if (ratio >= 1.0) {
+               log2_ratio = std::floor(std::log2(ratio));
+           }
+           _num_slot = 1 << log2_ratio; 
+      }
   }
-  if (_num_slot == 0) _num_slot = 1;
-
-  // 向下取整到最近的 2 的幂次 (例如 682 -> 512)
-  // double ratio = (double)N / num_query;
-  // uint32_t log2_ratio = 0;
-  // if (ratio >= 1.0) {
-  //     log2_ratio = std::floor(std::log2(ratio));
-  // }
-  // _num_slot = 1 << log2_ratio; 
   
-  // 兜底：如果 N < num_query，则 bundle > 1，这里设为1
   if (_num_slot == 0) _num_slot = 1;
-
-  _table_size = num_query; // 桶的数量 = 查询数量 (行数)
-  _bundle_size = 1;
 
   // 4. 【核心修复 - 防止 Segfault】手动构建 "完美" 桶结构
   // Server 编码时严重依赖 _bucket 和 _hash_index
@@ -204,11 +165,12 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
     _cw_index[index] = get_cw_code_k2(index, _encoding_size);
   }
 
+  // 【验证打印】请确保你在运行日志中能看到下面这几行！
   std::cout << "Direct Mode Params Initialized:" << std::endl;
-  std::cout << "  k=" << _hamming_weight << ", m=" << _encoding_size << std::endl;
-  std::cout << "  Table Size (Rows): " << _table_size << std::endl;
-  std::cout << "  Col Size: " << _col_size << std::endl;
-  std::cout << "  Hash Index Size: " << _hash_index.size() << std::endl;
+  std::cout << "  N: " << N << std::endl;
+  std::cout << "  Table Size: " << _table_size << std::endl;
+  std::cout << "  Bundle Size: " << _bundle_size << " (Expect > 1 for Large Query)" << std::endl; 
+  std::cout << "  Num Slot: " << _num_slot << std::endl;
   
   print_seal_parms();
   print_pir_parms();

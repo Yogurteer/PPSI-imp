@@ -415,53 +415,144 @@ void Server::batch_encode_to_ntt_db_without_compress() {
   }
 }
 
-// used for batch encode
 void Server::batch_encode_to_ntt_db_with_compress() {
-  assert(_pir_parms.get_is_compress() == true &&
-         "Wrong call! only used when compress is true!");
-  assert(_pir_parms.get_bundle_size() == 1 &&
-         "Compress is useful only when the bundle size is 1");
+  // 1. 删除断言
+  // assert(_pir_parms.get_bundle_size() == 1 && ...); // 删掉这行！
+  
   assert(_set_db && "Database has not been loaded correctly!");
-  std::cout << "Encode database now!" << std::endl;
+  std::cout << "Encode database now! (Multi-Bundle Supported)" << std::endl;
+
   auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
-  auto db_pt_size = _pir_parms.get_col_size() * compress_num_slot;
   auto table_size = _pir_parms.get_table_size();
-  uint32_t num_slot = _pir_parms.get_num_slot();
-  // (col_size, num_slot)
-  auto table = _pir_parms.get_cuckoo_table();
+  uint32_t num_slot = _pir_parms.get_num_slot(); // 在 Direct Mode 大规模下，这应该是 1
+  
+  // 获取关键的多 Bundle 参数
+  auto bundle_size = _pir_parms.get_bundle_size(); 
+  
+  // 数据库总大小 = 列数 * Payload分片数 * Bundle数
+  // 原来的代码少乘了 bundle_size，因为他假设是 1
+  auto db_pt_size = _pir_parms.get_col_size() * compress_num_slot * bundle_size;
+  
   auto bucket = _pir_parms.get_bucket();
 
   _encoded_db.resize(db_pt_size);
 
-  std::vector<uint64_t> plain_vector(_N, 0);
-  for (uint64_t pl_slot_index = 0; pl_slot_index < compress_num_slot;
-       pl_slot_index++) {
-    for (uint64_t col_index = 0; col_index < _pir_parms.get_col_size();
-         col_index++) {
-      seal::Plaintext encoded_plain;
-      for (uint32_t i = 0; i < table_size; i++) {
-        for (uint32_t slot = 0; slot < num_slot; slot++) {
-          if (col_index < bucket.at(i).size() &&
-              (pl_slot_index * num_slot + slot) <
-                  _pir_parms.get_num_payload_slot()) {
-            auto index = bucket.at(i).at(col_index);
-            plain_vector.at(i * num_slot + slot) =
-                _raw_db.at(index).at(pl_slot_index * num_slot + slot);
-          } else {
-            // Dummy slot can't be 0
-            // If bundle size >= 2, then there will be ALL zeros plaintext;
-            plain_vector.at(i * num_slot + slot) = 1;
-          }
-        }
+  // 【核心修改】：不再只申请一个 vector，而是申请一组 vectors
+  // plain_vectors[b] 代表第 b 个 bundle 的明文数据
+  std::vector<std::vector<uint64_t>> plain_vectors(bundle_size, std::vector<uint64_t>(_N, 1)); // 默认填充 1 (Dummy)
+
+  // 外层循环：遍历 Payload 的每一个分片 (0, 1, 2... 60)
+  for (uint64_t pl_slot_index = 0; pl_slot_index < compress_num_slot; pl_slot_index++) {
+    
+    // 中层循环：遍历每一列 (对于 Direct Mode 这种深桶结构，col_index 也是重要的)
+    for (uint64_t col_index = 0; col_index < _pir_parms.get_col_size(); col_index++) {
+      
+      // 每次处理一个新的 (Payload分片, 列) 组合时，都要重置 plain_vectors 为全 1 (Dummy)
+      // 注意：PIRANA 论文建议 dummy 填 1 而不是 0，以避免某些代数攻击或为了区分空桶
+      for(auto& vec : plain_vectors) {
+          std::fill(vec.begin(), vec.end(), 1); 
       }
-      _batch_encoder->encode(plain_vector, encoded_plain);
-      _evaluator->transform_to_ntt_inplace(encoded_plain,
-                                           _context->first_parms_id());
-      _encoded_db.at(pl_slot_index * _pir_parms.get_col_size() + col_index) =
-          encoded_plain;
+
+      // 内层循环：遍历每一行 (0 ~ 15359)
+      for (uint32_t i = 0; i < table_size; i++) {
+          
+          // 获取这一行对应的 bucket 内容
+          // Direct Mode 下，bucket[i] 里装的就是全局数据索引
+          if (col_index < bucket.at(i).size()) {
+              auto index = bucket.at(i).at(col_index);
+              
+              // 获取原始数据
+              // _raw_db[index] 是一个 vector，存储了切分后的 slots
+              // 我们要取第 pl_slot_index 个分片
+              // 注意：这里简化了原代码复杂的 (pl_slot_index * num_slot + slot) 逻辑
+              // 因为在大规模 Direct Mode 下，num_slot 必须为 1
+              
+              uint64_t val = 0;
+              
+              // 这里的取值逻辑要格外小心，保持与数据导入时一致
+              // 如果 num_slot == 1:
+              if (pl_slot_index < _raw_db.at(index).size()) {
+                  val = _raw_db.at(index).at(pl_slot_index);
+              }
+              
+              // 【核心分流逻辑】
+              // 计算这一行数据 (Row i) 应该落到哪个 Bundle 的哪个 Slot
+              uint64_t raw_pos = i * num_slot; // 实际上就是 i
+              uint64_t bundle_idx = raw_pos / _N;
+              uint64_t slot_idx = raw_pos % _N;
+
+              // 安全检查，防止越界
+              if (bundle_idx < bundle_size && slot_idx < _N) {
+                  plain_vectors[bundle_idx][slot_idx] = val;
+              }
+          }
+      }
+
+      // 编码并 NTT 变换
+      for (uint32_t b = 0; b < bundle_size; b++) {
+          seal::Plaintext encoded_plain;
+          _batch_encoder->encode(plain_vectors[b], encoded_plain);
+          _evaluator->transform_to_ntt_inplace(encoded_plain, _context->first_parms_id());
+          
+          // 存入 encoded_db
+          // 存储顺序展平：[Payload 0 包含的所有 Bundles] [Payload 1 包含的所有 Bundles] ...
+          // 计算偏移量
+          uint64_t db_index = (pl_slot_index * _pir_parms.get_col_size() * bundle_size) + 
+                              (col_index * bundle_size) + b;
+                              
+          _encoded_db.at(db_index) = encoded_plain;
+      }
     }
   }
 }
+
+// // used for batch encode
+// void Server::batch_encode_to_ntt_db_with_compress() {
+//   assert(_pir_parms.get_is_compress() == true &&
+//          "Wrong call! only used when compress is true!");
+//   assert(_pir_parms.get_bundle_size() == 1 &&
+//          "Compress is useful only when the bundle size is 1");
+//   assert(_set_db && "Database has not been loaded correctly!");
+//   std::cout << "Encode database now!" << std::endl;
+//   auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
+//   auto db_pt_size = _pir_parms.get_col_size() * compress_num_slot;
+//   auto table_size = _pir_parms.get_table_size();
+//   uint32_t num_slot = _pir_parms.get_num_slot();
+//   // (col_size, num_slot)
+//   auto table = _pir_parms.get_cuckoo_table();
+//   auto bucket = _pir_parms.get_bucket();
+
+//   _encoded_db.resize(db_pt_size);
+
+//   std::vector<uint64_t> plain_vector(_N, 0);
+//   for (uint64_t pl_slot_index = 0; pl_slot_index < compress_num_slot;
+//        pl_slot_index++) {
+//     for (uint64_t col_index = 0; col_index < _pir_parms.get_col_size();
+//          col_index++) {
+//       seal::Plaintext encoded_plain;
+//       for (uint32_t i = 0; i < table_size; i++) {
+//         for (uint32_t slot = 0; slot < num_slot; slot++) {
+//           if (col_index < bucket.at(i).size() &&
+//               (pl_slot_index * num_slot + slot) <
+//                   _pir_parms.get_num_payload_slot()) {
+//             auto index = bucket.at(i).at(col_index);
+//             plain_vector.at(i * num_slot + slot) =
+//                 _raw_db.at(index).at(pl_slot_index * num_slot + slot);
+//           } else {
+//             // Dummy slot can't be 0
+//             // If bundle size >= 2, then there will be ALL zeros plaintext;
+//             plain_vector.at(i * num_slot + slot) = 1;
+//           }
+//         }
+//       }
+//       _batch_encoder->encode(plain_vector, encoded_plain);
+//       _evaluator->transform_to_ntt_inplace(encoded_plain,
+//                                            _context->first_parms_id());
+//       _encoded_db.at(pl_slot_index * _pir_parms.get_col_size() + col_index) =
+//           encoded_plain;
+//     }
+//   }
+// }
 
 std::vector<seal::Ciphertext> Server::load_query(
     std::stringstream &query_stream, uint32_t query_ct_size) {

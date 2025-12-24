@@ -821,7 +821,7 @@ int main(int argc, char** argv) {
     if (receiver_size == 1) {
         batch_PIR_mode = "default"; // 单元素查询使用默认模式
     }
-    batch_PIR_mode = "default"; 
+    // batch_PIR_mode = "default"; 
     run_main(sender_size, receiver_size, payload_size, batch_PIR_mode);
     
     return 0;
