@@ -26,23 +26,25 @@ std::stringstream Client::gen_direct_batch_query(
   std::stringstream query_stream;
   uint64_t send_size = 0;
   
-  // 参数检查
   assert(direct_indices.size() == _pir_parms.get_num_query());
 
-  auto encoding_size = _pir_parms.get_encoding_size(); // m
+  auto encoding_size = _pir_parms.get_encoding_size(); // m = 7
   auto bundle_size = _pir_parms.get_bundle_size();     // e.g. 2
   auto num_slot = _pir_parms.get_num_slot();           // 1
 
-  // 总大小 = m * bundle_size
-  // 布局: [Bundle 0 所有 m 个密文] [Bundle 1 所有 m 个密文]
+  // 【必须确认这里】
+  // 总大小必须是 m * bundle_size (例如 7 * 2 = 14)
+  // 如果这里少了 bundle_size，Server 就会越界！
   auto query_ct_size = encoding_size * bundle_size;
   
+  // 
+  // 布局: [Bundle 0 的 m 个密文] [Bundle 1 的 m 个密文]
   std::vector<std::vector<uint64_t>> cw_query(query_ct_size,
                                               std::vector<uint64_t>(_N, 0));
 
   for (uint32_t i = 0; i < direct_indices.size(); ++i) {
-      uint32_t offset = direct_indices[i]; // Col Index
-      uint32_t loc = i;                    // Row Index
+      uint32_t offset = direct_indices[i]; 
+      uint32_t loc = i;                    
       
       auto cw = get_cw_code_k2(offset, encoding_size);
 
@@ -54,8 +56,8 @@ std::stringstream Client::gen_direct_batch_query(
         uint32_t slot_idx = absolute_pos % _N;
 
         if (bundle_idx < bundle_size) {
-            // 【核心修改】级联布局索引计算
-            // Base Index = bundle_idx * encoding_size
+            // 计算在扁平向量中的基准偏移
+            // 如果是 Bundle 1，偏移量就是 1 * 7 = 7
             uint32_t base_idx = bundle_idx * encoding_size;
             
             if (cw.first < encoding_size) {
@@ -68,13 +70,15 @@ std::stringstream Client::gen_direct_batch_query(
       }
   }
 
-  // 加密发送
+  // 加密发送 (必须发送 14 个)
   std::vector<seal::Ciphertext> query_cipher(query_ct_size);
   for (uint32_t i = 0; i < query_ct_size; i++) {
     seal::Plaintext pt;
     _batch_encoder->encode(cw_query[i], pt);
     send_size += _encryptor->encrypt_symmetric(pt).save(query_stream);
   }
+  
+  std::cout << "Client: Generated " << query_ct_size << " query ciphertexts." << std::endl;
   return query_stream;
 }
 
@@ -146,7 +150,7 @@ std::stringstream Client::gen_batch_query(
           _pir_parms.get_cuckoo_table()->query(kuku::make_item(0, q));
       auto loc = res.location();
       auto cw = _pir_parms.get_cw(
-          std::to_string(uint64_t(q) * _pir_parms.get_table_size() + loc));
+          std::to_string(uint64_t(q) * _pir_parms.get_table_size() + loc)); //开挂，oracle，client访问了server的cw_index映射关系
       cw_query[cw.first * bundle_size + loc / _N][loc % _N] = 1;
       cw_query[cw.second * bundle_size + loc / _N][loc % _N] = 1;
     }

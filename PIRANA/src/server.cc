@@ -383,7 +383,7 @@ void Server::batch_encode_to_ntt_db_without_compress() {
   auto table = _pir_parms.get_cuckoo_table();
   auto bucket = _pir_parms.get_bucket();
 
-  _encoded_db.resize(db_pt_size);
+  _encoded_db.resize(db_pt_size); // 每个元素是一个明文多项式，不是一个槽
 
   std::vector<uint64_t> plain_vector(_N, 0);
   for (uint64_t pl_slot_index = 0;
@@ -424,7 +424,7 @@ void Server::batch_encode_to_ntt_db_with_compress() {
 
   auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
   auto table_size = _pir_parms.get_table_size();
-  uint32_t num_slot = _pir_parms.get_num_slot(); // 在 Direct Mode 大规模下，这应该是 1
+  uint32_t num_slot = _pir_parms.get_num_slot(); 
   
   // 获取关键的多 Bundle 参数
   auto bundle_size = _pir_parms.get_bundle_size(); 
