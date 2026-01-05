@@ -410,11 +410,6 @@ bool run_oos_ot(
         double ext_time = std::chrono::duration<double, std::milli>(ext_end - ext_start).count();
         double total_time = std::chrono::duration<double, std::milli>(total_end - start_time).count();
         
-        // std::cout << "[OOS OT] 完成 " << numOTs << " 个OT实例 (N=" << N << ")" << std::endl;
-        // std::cout << "  Base OT: " << base_time << " ms" << std::endl;
-        // std::cout << "  Extension: " << ext_time << " ms" << std::endl;
-        // std::cout << "  Total: " << total_time << " ms" << std::endl;
-        
         return true;
         
     } catch (const std::exception& e) {

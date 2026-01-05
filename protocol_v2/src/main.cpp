@@ -69,90 +69,6 @@ std::vector<uint64_t> extract_payload_slots_from_answer(
     return result;
 }
 
-// // Batch PIR
-// std::vector<Element> run_batch_pir(
-//     const std::vector<Element>& database_items,
-//     const std::vector<uint32_t>& query_indices,
-//     size_t num_rows,
-//     size_t row_size,
-//     size_t payload_size,
-//     double &online_time) {
-    
-//     std::vector<Element> results;
-    
-//     // std::cout << "[PIR] 完成 " << results.size() << " 个查询" << std::endl;
-//     uint64_t num_payloads = database_items.size();
-//     uint64_t num_query = query_indices.size();
-//     bool is_batch = true;
-//     bool is_compress = false;
-    
-//     // 注意: my_batch_pir_main 的 payload_size 参数应该是字节数，不是 uint64_t 数量
-//     // PirParms 会根据 payload_size(字节) 自动计算需要的 num_payload_slot
-//     // 计算公式: num_payload_slot = ceil(payload_size * 8 / (plain_modulus_bit - 1))
-    
-//     // 首先需要创建 PirParms 来获取正确的 num_payload_slot
-//     cout << "构造 PirParms ..." << endl;
-//     PirParms temp_pir_parms(num_payloads, payload_size, num_query, is_batch, is_compress);
-//     auto plain_modulus_bit = temp_pir_parms.get_seal_parms().plain_modulus().bit_count();
-//     auto expected_num_payload_slot = temp_pir_parms.get_num_payload_slot();
-    
-//     std::cout << "\n[数据预处理] payload_size=" << payload_size << " bytes" << std::endl;
-//     std::cout << "[数据预处理] plain_modulus_bit=" << plain_modulus_bit << std::endl;
-//     std::cout << "[数据预处理] 每个payload需要 " << expected_num_payload_slot << " slots" << std::endl;
-//     std::cout << "[数据预处理] 每个slot可存储 " << (plain_modulus_bit - 1) << " bits" << std::endl;
-    
-//     // 将 Element (字节向量) 转换为 uint64_t 向量
-//     // 每个 payload 需要转换为 expected_num_payload_slot 个 uint64_t
-//     std::vector<std::vector<uint64_t>> input_db(num_payloads);
-    
-//     for (size_t i = 0; i < num_payloads; ++i) {
-//         const auto& elem = database_items[i];
-        
-//         if (elem.size() != payload_size) {
-//             std::cerr << "错误: database_items[" << i << "].size()=" << elem.size() 
-//                       << " 不等于 payload_size=" << payload_size << std::endl;
-//             throw std::runtime_error("Payload size mismatch in database_items");
-//         }
-        
-//         // 按照PIR的要求，将字节数据分割到多个slots中
-//         // 每个slot存储 (plain_modulus_bit - 1) bits
-//         input_db[i].resize(expected_num_payload_slot, 0);
-        
-//         size_t bits_per_slot = plain_modulus_bit - 1;
-//         size_t bit_offset = 0;
-        
-//         for (size_t slot_idx = 0; slot_idx < expected_num_payload_slot; slot_idx++) {
-//             uint64_t slot_value = 0;
-//             size_t bits_in_this_slot = std::min(bits_per_slot, payload_size * 8 - bit_offset);
-            
-//             // 从字节数组中提取bits_in_this_slot个比特
-//             for (size_t bit = 0; bit < bits_in_this_slot; bit++) {
-//                 size_t byte_idx = (bit_offset + bit) / 8;
-//                 size_t bit_in_byte = (bit_offset + bit) % 8;
-                
-//                 if (byte_idx < elem.size()) {
-//                     uint64_t bit_value = (elem[byte_idx] >> bit_in_byte) & 1;
-//                     slot_value |= (bit_value << bit);
-//                 }
-//             }
-            
-//             // 与PIR内部逻辑保持一致：将0值替换为8888
-//             if (slot_value == 0) {
-//                 slot_value = 8888;
-//             }
-            
-//             input_db[i][slot_idx] = slot_value;
-//             bit_offset += bits_per_slot;
-//         }
-//     }
-    
-//     std::cout << "[数据预处理] 完成，转换了 " << num_payloads << " 个payloads" << std::endl;
-
-//     results = my_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
-//                    is_compress, input_db, query_indices, online_time);
-//     return results;
-// }
-
 // Batch PIR 接口更新
 std::vector<Element> run_batch_pir(
     const std::vector<Element>& database_items,
@@ -424,7 +340,7 @@ void phase3_prepare_pir(
     size_t sender_num_main_buckets = sender.get_num_main_buckets();
     auto [sender_nh, sender_sub_capacity] = sender.get_sub_bucket_structure();
     
-    // Receiver使用Sender的桶结构生成查询索引
+    // Receiver生成查询索引
     receiver.generate_pir_query_indices(sender_num_main_buckets, sender_nh, sender_sub_capacity);
     
     // 获取数据库和查询
@@ -514,7 +430,8 @@ void simulate_pir(
 void phase5_ot_bucket_keys(
     LPSISender& sender,
     LPSIReceiver& receiver,
-    std::vector<Element>& bucket_keys) {
+    std::vector<Element>& bucket_keys,
+    size_t len_byte_r) {
     
     std::cout << "\n---------------Call OOS OT-----------------------" << std::endl;
     
@@ -529,17 +446,18 @@ void phase5_ot_bucket_keys(
     std::vector<size_t> receiver_choices = receiver.get_ot_choices();
     
     if (receiver_choices.empty()) {
-        // std::cout << "警告: Receiver没有命中任何元素,跳过OT" << std::endl;
+        std::cout << "警告: Receiver没有命中任何元素,跳过OT" << std::endl;
+        throw std::runtime_error("Receiver OT choices are empty");  
         return;
     }
     
     // Sender准备OT输入
-    if (!sender.prepare_ot_inputs(receiver_choices.size())) {
-        std::cerr << "Sender OT准备失败" << std::endl;
+    if (!sender.prepare_ot_inputs()) {
+        std::cerr << "Sender OT桶密钥未初始化" << std::endl;
         return;
     }
     
-    // 获取Sender的OT输入 (所有桶密钥作为选项)
+    // 获取Sender的OT输入 (所有桶密钥作为选项) ot_inputs[0] = bucket_keys
     std::vector<std::vector<Element>> sender_ot_base = sender.get_ot_inputs();
     
     if (sender_ot_base.empty() || sender_ot_base[0].empty()) {
@@ -554,17 +472,18 @@ void phase5_ot_bucket_keys(
         input_bit_count++;
     }
     
-    size_t N = 1ULL << input_bit_count;  // OT选择数 (2的幂次)
+    size_t N = 1ULL << input_bit_count;  // OT选择数N需要从num_buckets扩展到最近2的幂次
     
     // 将桶密钥扩展到N个 (填充空密钥)
     // OT现在支持OT_DATA_SIZE字节的传输(默认32字节)
     std::vector<Element> padded_keys = sender_ot_base[0];
     
     while (padded_keys.size() < N) {
-        padded_keys.push_back(Element(32, 0));  // 填充32字节的空密钥
+        padded_keys.push_back(Element(len_byte_r, 0));  // 填充空密钥
     }
     
-    // 构建完整的OT输入: 每个OT实例都提供N个选择
+    // 构建完整的OT输入: k个实例,每个OT实例都提供N个选择
+    // 安全性考虑,在此处receiver告知了sender请求桶密钥的数量
     size_t num_ot_instances = receiver_choices.size();
     std::vector<std::vector<Element>> sender_ot_inputs(num_ot_instances, padded_keys);
     
@@ -708,7 +627,10 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     std::cout << "\n[5] 正在执行: OT..." << std::endl;
     auto t4_start = high_resolution_clock::now();
     std::vector<Element> bucket_keys;
-    phase5_ot_bucket_keys(sender, receiver, bucket_keys);
+    size_t len_byte_r = LPSIConfig::BUCKET_KEY_SIZE_BYTES;
+
+    phase5_ot_bucket_keys(sender, receiver, bucket_keys, len_byte_r);
+    
     auto t4_end = high_resolution_clock::now();
     auto dur_ot = duration_cast<milliseconds>(t4_end - t4_start).count();
 
@@ -800,7 +722,7 @@ int main(int argc, char** argv) {
                 // 注意: 还需要确保 LPSIConfig 中的 PIR_ITEM_SIZE 也被更新
                 // 如果 config 是静态常量，这里可能需要额外处理
                 // 建议在 config.h 中将 PIR_ITEM_SIZE 改为 static 变量或添加设置函数
-                LPSIConfig::PIR_ITEM_SIZE = 128; // 示例: 固定为128 bytes，实际可根据需要调整
+                LPSIConfig::PIR_ITEM_SIZE = 64; // 示例: 固定为64 bytes，实际可根据需要调整
                 break;
             case 'h':
                 std::cout << "Usage: " << argv[0] << " [options]\n"

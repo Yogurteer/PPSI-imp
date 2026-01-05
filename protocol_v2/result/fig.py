@@ -12,7 +12,7 @@ except ImportError:
     plt.style.use('ggplot')
 
 # 读取数据
-file_name = 'benchmark_summary_16.csv'
+file_name = 'benchmark_2_20.csv'
 df = pd.read_csv(file_name)
 
 # 定义需要堆叠的列 (各阶段开销)
