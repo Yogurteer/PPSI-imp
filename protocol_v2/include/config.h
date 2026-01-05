@@ -7,10 +7,15 @@
 // ========================================
 //  可支付LPSI协议配置参数
 // ========================================
-namespace PIR {
-    const uint64_t default_poly_degree = 8192;
+class PpsiParm {
     
-}
+public:
+    PpsiParm();
+    ~PpsiParm();
+
+    uint64_t poly_degree = 4096; // 多项式度数 (PIR参数)
+};
+
 
 namespace LPSIConfig {
     // ===== 哈希桶配置 =====
@@ -19,7 +24,7 @@ namespace LPSIConfig {
     // 主桶数量倍数 (相对于receiver数据量)
     // 推荐值: 2.5 - 3.0 (更大的值提高Cuckoo哈希成功率，但增加通信开销)
     constexpr double MAIN_BUCKET_FACTOR = 2.5;
-    constexpr double SUB_BUCKET_FACTOR = 1.9;
+    constexpr double SUB_BUCKET_FACTOR = 1.9; // 每个sub桶容量倍数 (相对于主桶最大元素数)
     // 最大重试次数，防止无限循环
     constexpr size_t MAX_RETRY = 750;
 
@@ -33,17 +38,12 @@ namespace LPSIConfig {
     // 注意：内层Cuckoo哈希的hash函数数量应该等于子桶数量
     constexpr int NUM_SUB_BUCKETS = 3;
     
-    // 子桶容量负载因子 (用于动态计算容量)
-    // 推荐值: 8.0-10.0 (考虑到外层Simple Hash负载不均和内层Cuckoo Hash的特性)
-    // 负载因子需要足够大以应对最坏情况的桶负载
-    // 对于3-way Cuckoo Hash，由于外层负载极度不均，需要非常大的负载因子
-    constexpr double SUB_BUCKET_LOAD_FACTOR = 15.0;
-    
     // 子桶容量 (每个子桶能容纳的元素数)
     // 注意：此值已不再使用，容量将根据实际数据规模动态计算
-    // 计算公式: capacity = ceil((sender_size / num_main_buckets) / NUM_SUB_BUCKETS * SUB_BUCKET_LOAD_FACTOR)
     constexpr size_t SUB_BUCKET_CAPACITY = 20;  // 保留作为最小容量
     
+    // 桶密钥尺寸设置
+    constexpr size_t BUCKET_KEY_SIZE_BYTES = 32;
     // ===== Cuckoo哈希配置 =====
     
     // // Cuckoo哈希最大踢出次数
@@ -71,7 +71,7 @@ namespace LPSIConfig {
     // PIR数据库项大小 (字节)
     // x_prime + masked_value
     
-    inline size_t PIR_ITEM_SIZE = 128; // 给个默认值，main中会重写
+    inline size_t PIR_ITEM_SIZE = 64;
     
     // ===== 密码学参数 =====
     

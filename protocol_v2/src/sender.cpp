@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <random>
 
-LPSISender::LPSISender() : intersection_size(0) {
+LPSISender::LPSISender(){
     // 初始化 P-256 曲线
     group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
     
@@ -29,31 +29,6 @@ LPSISender::LPSISender() : intersection_size(0) {
     if (!debug_log.is_open()) {
         std::cerr << "警告: 无法打开Sender日志文件" << std::endl;
     }
-    
-    // // 使用一个2048位的安全素数 (Sophie Germain prime)
-    // // 这是 2^2048 - 2^1984 - 1 + 2^64 * floor(2^1918 * π) 的标准素数
-    // const char* prime_hex = 
-    //     "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1"
-    //     "29024E088A67CC74020BBEA63B139B22514A08798E3404DD"
-    //     "EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245"
-    //     "E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED"
-    //     "EE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3D"
-    //     "C2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F"
-    //     "83655D23DCA3AD961C62F356208552BB9ED529077096966D"
-    //     "670C354E4ABC9804F1746C08CA18217C32905E462E36CE3B"
-    //     "E39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9"
-    //     "DE2BCBF6955817183995497CEA956AE515D2261898FA0510"
-    //     "15728E5A8AACAA68FFFFFFFFFFFFFFFF";
-    
-    // BN_hex2bn(&prime_p, prime_hex);
-    
-    // // 生成随机数 r_s (在 [1, p-2] 范围内)
-    // BIGNUM* p_minus_2 = BN_new();
-    // BN_sub(p_minus_2, prime_p, BN_value_one());
-    // BN_sub(p_minus_2, p_minus_2, BN_value_one());
-    // BN_rand_range(r_s, p_minus_2);
-    // BN_add(r_s, r_s, BN_value_one());  // 确保 >= 1
-    // BN_free(p_minus_2);
 }
 
 LPSISender::~LPSISender() {
@@ -264,12 +239,13 @@ void LPSISender::build_hash_buckets(size_t num_main_buckets, int num_hash_funcs)
     std::cout << "Sender: 构建主哈希桶 (3-way Simple Hash)..." << std::endl;
     
     // 与Receiver保持一致，使用配置文件中的倍数参数
-    size_t bucket_count = num_main_buckets;
-    X_star.resize(bucket_count);
-    bucket_keys.resize(bucket_count);
+
+    num_main_b = num_main_buckets;
+    X_star.resize(num_main_b);
+    bucket_keys.resize(num_main_b);
     
     // 为每个桶生成随机密钥 r_k
-    for (size_t k = 0; k < bucket_count; ++k) {
+    for (size_t k = 0; k < num_main_b; ++k) {
         Element key(32);
         RAND_bytes(key.data(), 32);
         bucket_keys[k] = key;
@@ -584,7 +560,6 @@ std::vector<Element> LPSISender::send_bucket_keys_plaintext(
     
     // std::cout << "Sender: 明文发送 " << requested_indices.size() << " 个桶密钥" << std::endl;
     
-    intersection_size = requested_indices.size();
     
     std::vector<Element> keys;
     for (size_t idx : requested_indices) {
@@ -595,13 +570,12 @@ std::vector<Element> LPSISender::send_bucket_keys_plaintext(
             keys.push_back(empty_key);
         }
     }
-    
-    // std::cout << "Sender: 推断交集大小 = " << intersection_size << std::endl;
+
     return keys;
 }
 
 // Phase 4: 准备真实OT输入
-bool LPSISender::prepare_ot_inputs(size_t receiver_choice_count) {
+bool LPSISender::prepare_ot_inputs() {
     // std::cout << "Sender: 准备OT输入 (总共 " << bucket_keys.size() << " 个桶密钥)" << std::endl;
     
     // 验证
@@ -610,9 +584,6 @@ bool LPSISender::prepare_ot_inputs(size_t receiver_choice_count) {
         return false;
     }
     
-    intersection_size = receiver_choice_count;
-    
-    // std::cout << "Sender: OT输入准备完成, 推断交集大小 = " << intersection_size << std::endl;
     return true;
 }
 

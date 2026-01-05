@@ -53,6 +53,9 @@ private:
     Element point_to_bytes(const EC_POINT* point, BN_CTX* ctx);
     // 将字节转换为点
     EC_POINT* bytes_to_point(const Element& bytes, BN_CTX* ctx);
+
+    // 数据结构参数
+    size_t num_main_b;
     
     
 public:
@@ -82,7 +85,7 @@ public:
     // 真实OT协议 (k-out-of-n OT)
     // receiver_choice_count: Receiver请求的桶数量 (用于构建OT实例)
     // 返回: OT执行是否成功
-    bool prepare_ot_inputs(size_t receiver_choice_count);
+    bool prepare_ot_inputs();
     std::vector<std::vector<Element>> get_ot_inputs() const;
     
     // 获取统计信息
@@ -90,7 +93,7 @@ public:
     void set_intersection_size(size_t size) { intersection_size = size; }
     
     // 获取桶结构信息 (用于Receiver计算正确的PIR索引)
-    size_t get_num_main_buckets() const { return X_sub_star.size(); }
+    size_t get_num_main_buckets() const { return num_main_b; }
     std::pair<size_t, size_t> get_sub_bucket_structure() const {
         if (X_sub_star.empty() || X_sub_star[0].empty()) return {0, 0};
         return {X_sub_star[0].size(), X_sub_star[0][0].size()};  // (nh, capacity)

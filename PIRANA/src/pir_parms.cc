@@ -74,107 +74,107 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   print_pir_parms();
 }
 
-// 【修正后的 Direct Mode 构造函数】
-PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
-                   const uint64_t num_query, const uint64_t direct_col_size)
-    : _num_payloads(num_payloads),
-      _payload_size(payload_size),
-      _num_query(num_query),
-      _col_size(direct_col_size),
-      _is_compress(true), // Direct Mode 通常开启压缩
-      _enable_rotate(false) {
+// // 【修正后的 Direct Mode 构造函数】
+// PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
+//                    const uint64_t num_query, const uint64_t direct_col_size)
+//     : _num_payloads(num_payloads),
+//       _payload_size(payload_size),
+//       _num_query(num_query),
+//       _col_size(direct_col_size),
+//       _is_compress(true), // Direct Mode 通常开启压缩
+//       _enable_rotate(false) {
 
-  // 1. 恢复 k=2 (PIRANA 核心)
-  // 注意：请确保头文件 pir_parms.h 中的 _hamming_weight 设 2
+//   // 1. 恢复 k=2 (PIRANA 核心)
+//   // 注意：请确保头文件 pir_parms.h 中的 _hamming_weight 设 2
 
-  // 2. 设置 SEAL 参数 (保持4096不变)
-  // uint64_t poly_degree = 4096;
-  // std::vector<int> coeff_modulus = {48, 32, 24};
-  uint64_t poly_degree = 8192; 
-  std::vector<int> coeff_modulus = {56, 56, 24, 24};
-  uint64_t plain_prime_len = 18;
-  set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
+//   // 2. 设置 SEAL 参数 (保持4096不变)
+//   // uint64_t poly_degree = 4096;
+//   // std::vector<int> coeff_modulus = {48, 32, 24};
+//   uint64_t poly_degree = 8192; 
+//   std::vector<int> coeff_modulus = {56, 56, 24, 24};
+//   uint64_t plain_prime_len = 18;
+//   set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
 
-  _num_payload_slot = std::ceil(payload_size * 8.0 / (plain_prime_len - 1));
+//   _num_payload_slot = std::ceil(payload_size * 8.0 / (plain_prime_len - 1));
 
-  // 3. 设置 PIRANA 结构参数
-  uint32_t N = _seal_parms.poly_modulus_degree();
+//   // 3. 设置 PIRANA 结构参数
+//   uint32_t N = _seal_parms.poly_modulus_degree();
 
-  _table_size = num_query; // 桶的数量 = 查询数量 (行数)
-  // 【核心修复】计算需要的 Bundle 数量
-  // 如果行数超过 N，我们需要多个密文来承载
-  // 例如: 15360 / 8192 = 1.875 -> 需要 2 个 Bundle
-  _bundle_size = std::ceil((double)_table_size / N);
+//   _table_size = num_query; // 桶的数量 = 查询数量 (行数)
+//   // 【核心修复】计算需要的 Bundle 数量
+//   // 如果行数超过 N，我们需要多个密文来承载
+//   // 例如: 15360 / 8192 = 1.875 -> 需要 2 个 Bundle
+//   _bundle_size = std::ceil((double)_table_size / N);
 
-  // 【核心修复】计算 Num Slot (步长)
-  if (_bundle_size > 1) {
-      // 如果使用了多个 Bundle，为了保证跨 Bundle 的对齐，强制 stride 为 1
-      // 这意味着:
-      // Row 0 -> Bundle 0, Slot 0
-      // Row 8192 -> Bundle 1, Slot 0
-      _num_slot = 1; 
-  } else {
-      // 只有 1 个 Bundle 的情况 (小规模)
-      // 保持之前的逻辑: 如果极小则 compact，否则按比例对齐
-      if (num_query <= N) {
-          _num_slot = 1; 
-      } else {
-          // 这里其实不会执行，因为如果 num_query > N，bundle_size 就会 > 1
-          // 但为了逻辑完备保留 fallback
-           double ratio = (double)N / num_query;
-           uint32_t log2_ratio = 0;
-           if (ratio >= 1.0) {
-               log2_ratio = std::floor(std::log2(ratio));
-           }
-           _num_slot = 1 << log2_ratio; 
-      }
-  }
+//   // 【核心修复】计算 Num Slot (步长)
+//   if (_bundle_size > 1) {
+//       // 如果使用了多个 Bundle，为了保证跨 Bundle 的对齐，强制 stride 为 1
+//       // 这意味着:
+//       // Row 0 -> Bundle 0, Slot 0
+//       // Row 8192 -> Bundle 1, Slot 0
+//       _num_slot = 1; 
+//   } else {
+//       // 只有 1 个 Bundle 的情况 (小规模)
+//       // 保持之前的逻辑: 如果极小则 compact，否则按比例对齐
+//       if (num_query <= N) {
+//           _num_slot = 1; 
+//       } else {
+//           // 这里其实不会执行，因为如果 num_query > N，bundle_size 就会 > 1
+//           // 但为了逻辑完备保留 fallback
+//            double ratio = (double)N / num_query;
+//            uint32_t log2_ratio = 0;
+//            if (ratio >= 1.0) {
+//                log2_ratio = std::floor(std::log2(ratio));
+//            }
+//            _num_slot = 1 << log2_ratio; 
+//       }
+//   }
   
-  if (_num_slot == 0) _num_slot = 1;
+//   if (_num_slot == 0) _num_slot = 1;
 
-  // 4. 【核心修复 - 防止 Segfault】手动构建 "完美" 桶结构
-  // Server 编码时严重依赖 _bucket 和 _hash_index
-  // 必须初始化它们，否则 crash！
+//   // 4. 【核心修复 - 防止 Segfault】手动构建 "完美" 桶结构
+//   // Server 编码时严重依赖 _bucket 和 _hash_index
+//   // 必须初始化它们，否则 crash！
   
-  std::cout << "Direct Mode: Building deterministic buckets..." << std::endl;
+//   std::cout << "Direct Mode: Building deterministic buckets..." << std::endl;
   
-  _bucket.resize(_table_size); 
+//   _bucket.resize(_table_size); 
   
-  for (uint32_t row = 0; row < _table_size; ++row) {
-      for (uint32_t col = 0; col < _col_size; ++col) {
-          uint64_t global_idx = row * _col_size + col;
+//   for (uint32_t row = 0; row < _table_size; ++row) {
+//       for (uint32_t col = 0; col < _col_size; ++col) {
+//           uint64_t global_idx = row * _col_size + col;
           
-          // 边界检查：不要放入超出 num_payloads 的索引
-          if (global_idx < _num_payloads) {
-              _bucket[row].push_back(global_idx);
+//           // 边界检查：不要放入超出 num_payloads 的索引
+//           if (global_idx < _num_payloads) {
+//               _bucket[row].push_back(global_idx);
               
-              // 【关键】Server 依赖这个 map 来反查元素的列位置
-              _hash_index[std::to_string(global_idx)] = col;
-          }
-      }
-  }
+//               // 【关键】Server 依赖这个 map 来反查元素的列位置
+//               _hash_index[std::to_string(global_idx)] = col;
+//           }
+//       }
+//   }
 
-  // 5. 【核心修复 - 防止 Segfault】初始化 Codeword 索引表
-  // k=2 编码必须用到 _cw_index。如果是空的，Server 访问时必定段错误。
+//   // 5. 【核心修复 - 防止 Segfault】初始化 Codeword 索引表
+//   // k=2 编码必须用到 _cw_index。如果是空的，Server 访问时必定段错误。
   
-  _cw_index.resize(_col_size);
-  _encoding_size = calculate_encoding_size(_col_size); // 计算 m
+//   _cw_index.resize(_col_size);
+//   _encoding_size = calculate_encoding_size(_col_size); // 计算 m
   
-  for (uint64_t index = 0; index < _col_size; index++) {
-    // 预计算每一列对应的 k=2 组合
-    _cw_index[index] = get_cw_code_k2(index, _encoding_size);
-  }
+//   for (uint64_t index = 0; index < _col_size; index++) {
+//     // 预计算每一列对应的 k=2 组合
+//     _cw_index[index] = get_cw_code_k2(index, _encoding_size);
+//   }
 
-  // 【验证打印】请确保你在运行日志中能看到下面这几行！
-  std::cout << "Direct Mode Params Initialized:" << std::endl;
-  std::cout << "  N: " << N << std::endl;
-  std::cout << "  Table Size: " << _table_size << std::endl;
-  std::cout << "  Bundle Size: " << _bundle_size << " (Expect > 1 for Large Query)" << std::endl; 
-  std::cout << "  Num Slot: " << _num_slot << std::endl;
+//   // 【验证打印】请确保你在运行日志中能看到下面这几行！
+//   std::cout << "Direct Mode Params Initialized:" << std::endl;
+//   std::cout << "  N: " << N << std::endl;
+//   std::cout << "  Table Size: " << _table_size << std::endl;
+//   std::cout << "  Bundle Size: " << _bundle_size << " (Expect > 1 for Large Query)" << std::endl; 
+//   std::cout << "  Num Slot: " << _num_slot << std::endl;
   
-  print_seal_parms();
-  print_pir_parms();
-}
+//   print_seal_parms();
+//   print_pir_parms();
+// }
 
 // 自定义新PirParms构造函数，适配Direct Mode
 PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
@@ -387,12 +387,12 @@ void PirParms::get_all_index_hash_result(const uint64_t num_payloads,
   kuku::item_type hash_seed = kuku::make_item(1, 0);
   uint64_t max_probe = 100;
   kuku::item_type empty_item = kuku::make_item(0xFFFF, 0);
-  std::cout << "Pir Cuckoo parameters: " << std::endl;
-  // print N _num_slot _bundle_size 
-  std::cout << "  Poly modulus degree (N): " << N << std::endl;
-  std::cout << "  Number of slots per ciphertext: " << _num_slot << std::endl;
-  std::cout << "  Bundle size: " << _bundle_size << std::endl;
-  std::cout << "  Table size (B = 1.5L): " << _table_size << std::endl;
+  // std::cout << "Pir Cuckoo parameters: " << std::endl;
+  // // print N _num_slot _bundle_size 
+  // std::cout << "  Poly modulus degree (N): " << N << std::endl;
+  // std::cout << "  Number of slots per ciphertext: " << _num_slot << std::endl;
+  // std::cout << "  Bundle size: " << _bundle_size << std::endl;
+  // std::cout << "  Table size (B = 1.5L): " << _table_size << std::endl;
   _table = std::make_shared<kuku::KukuTable>(
       _table_size, stash_size, hash_count, hash_seed, max_probe, empty_item);
 
@@ -434,5 +434,7 @@ void PirParms::print_pir_parms() {
 
   std::cout << "|   Hamming weight (k): " << _hamming_weight << std::endl;
   std::cout << "|   Encoding size (m): " << _encoding_size << std::endl;
+  // print bundle size
+  std::cout << "|   Bundle size: " << _bundle_size << std::endl;
   std::cout << "\\" << std::endl;
 }
