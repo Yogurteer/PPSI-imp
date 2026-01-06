@@ -451,8 +451,8 @@ void phase5_ot_bucket_keys(
         return;
     }
     
-    // Sender准备OT输入
-    if (!sender.prepare_ot_inputs()) {
+    // Sender准备OT输入，获取receiver请求的桶数量，作为sender最终output
+if (!sender.prepare_ot_inputs(receiver_choices.size())) {
         std::cerr << "Sender OT桶密钥未初始化" << std::endl;
         return;
     }
@@ -555,6 +555,7 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     std::cout << "========================================" << std::endl;
     std::cout << "   Payable LPSI协议 (动态参数分段计时)" << std::endl;
     std::cout << "========================================" << std::endl;
+    std::cout << "Mode: " << batch_PIR_mode << std::endl;
 
     // 创建实例
     LPSISender sender;
@@ -586,8 +587,15 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     // [3] Hash Buckets
     std::cout << "\n[3] 正在执行: 构造双层Hash..." << std::endl;
     double receiver_gen_idx_time = 0.0;
-    // 【修改】使用传入的 size
+    
+    // 填充receiver_raw_data到N的整数倍
+    size_t original_receiver_size = receiver_raw_data.size();
+    PpsiParm gloal_parm;
+    size_t N = gloal_parm.poly_degree;
+    size_t ratio = (original_receiver_size + N - 1) / N; // 向上取整
+    size_t pad_receiver_size = ratio * N;
     phase2_build_hash_buckets(sender, receiver, sender_raw_data.size(), receiver_raw_data.size(), receiver_gen_idx_time);
+    // phase2_build_hash_buckets(sender, receiver, sender_raw_data.size(), pad_receiver_size, receiver_gen_idx_time);
     auto dur_hash = receiver_gen_idx_time;
 
     // ==========================================
@@ -706,10 +714,10 @@ int main(int argc, char** argv) {
     size_t sender_size = 4096;   // 默认 2^12
     size_t receiver_size = 1024;  // 默认 2^8
     size_t payload_size = 1;     // 默认 1 byte
+    size_t is_default_mode = 1; // 默认使用 Default Mode
     
-
     int opt;
-    while ((opt = getopt(argc, argv, "x:y:p:h")) != -1) {
+    while ((opt = getopt(argc, argv, "x:y:p:m:h")) != -1) {
         switch (opt) {
             case 'x':
                 sender_size = std::stoul(optarg);
@@ -722,7 +730,11 @@ int main(int argc, char** argv) {
                 // 注意: 还需要确保 LPSIConfig 中的 PIR_ITEM_SIZE 也被更新
                 // 如果 config 是静态常量，这里可能需要额外处理
                 // 建议在 config.h 中将 PIR_ITEM_SIZE 改为 static 变量或添加设置函数
-                LPSIConfig::PIR_ITEM_SIZE = 64; // 示例: 固定为64 bytes，实际可根据需要调整
+                LPSIConfig::PIR_ITEM_SIZE = 128; // 实际可根据需要调整
+                break;
+            case 'm':
+                // 1-default mode, 0-direct mode
+                is_default_mode = std::stoul(optarg);
                 break;
             case 'h':
                 std::cout << "Usage: " << argv[0] << " [options]\n"
@@ -730,6 +742,7 @@ int main(int argc, char** argv) {
                           << "  -x <size>   Sender data size (default: 4096)\n"
                           << "  -y <size>   Receiver data size (default: 256)\n"
                           << "  -p <bytes>  Payload size in bytes (default: 1)\n"
+                          << "  -m <mode>   Batch PIR mode: 1-default, 0-direct (default: 1)\n"
                           << "  -h          Show this help message\n";
                 return 0;
             default:
@@ -743,7 +756,9 @@ int main(int argc, char** argv) {
     if (receiver_size == 1) {
         batch_PIR_mode = "default"; // 单元素查询使用默认模式
     }
-    // batch_PIR_mode = "default"; 
+    if (is_default_mode == 1) {
+        batch_PIR_mode = "default";
+    }
     run_main(sender_size, receiver_size, payload_size, batch_PIR_mode);
     
     return 0;
