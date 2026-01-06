@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 // ========================================
 //  可支付LPSI协议配置参数
@@ -13,7 +14,7 @@ public:
     PpsiParm();
     ~PpsiParm();
 
-    uint64_t poly_degree = 4096; // 多项式度数 (PIR参数)
+    uint64_t poly_degree = 8192; // 多项式度数 (PIR参数)
 };
 
 
@@ -28,11 +29,9 @@ namespace LPSIConfig {
     // 最大重试次数，防止无限循环
     constexpr size_t MAX_RETRY = 750;
 
-    
     // 外层哈希函数数量 (Cuckoo哈希的候选位置数)
     constexpr int OUTER_NUM_HASH_FUNCTIONS = 3;
     constexpr int INNER_NUM_HASH_FUNCTIONS = 3;
-
     
     // 子桶数量 (每个主桶内的子桶数，用于第二层哈希)
     // 注意：内层Cuckoo哈希的hash函数数量应该等于子桶数量
@@ -44,11 +43,6 @@ namespace LPSIConfig {
     
     // 桶密钥尺寸设置
     constexpr size_t BUCKET_KEY_SIZE_BYTES = 32;
-    // ===== Cuckoo哈希配置 =====
-    
-    // // Cuckoo哈希最大踢出次数
-    // // 对于大规模数据，增加迭代次数提高成功率
-    // constexpr int MAX_CUCKOO_ITERATIONS = 10000;
     
     // ===== 哈希函数种子 =====
     

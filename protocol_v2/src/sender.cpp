@@ -241,6 +241,7 @@ void LPSISender::build_hash_buckets(size_t num_main_buckets, int num_hash_funcs)
     // 与Receiver保持一致，使用配置文件中的倍数参数
 
     num_main_b = num_main_buckets;
+    size_t bucket_count = num_main_buckets;
     X_star.resize(num_main_b);
     bucket_keys.resize(num_main_b);
     
@@ -575,7 +576,7 @@ std::vector<Element> LPSISender::send_bucket_keys_plaintext(
 }
 
 // Phase 4: 准备真实OT输入
-bool LPSISender::prepare_ot_inputs() {
+bool LPSISender::prepare_ot_inputs(size_t receiver_choice_count) {
     // std::cout << "Sender: 准备OT输入 (总共 " << bucket_keys.size() << " 个桶密钥)" << std::endl;
     
     // 验证
@@ -583,7 +584,9 @@ bool LPSISender::prepare_ot_inputs() {
         std::cerr << "错误: 桶密钥未生成" << std::endl;
         return false;
     }
-    
+
+    intersection_size = receiver_choice_count;
+
     return true;
 }
 

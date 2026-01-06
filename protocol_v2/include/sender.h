@@ -71,7 +71,7 @@ public:
     void reshuffle_data();  // OPRF后重随机化数据
     
     // Phase 2: 哈希桶 + 子桶
-    void build_hash_buckets(size_t receiver_size, int num_hash_funcs);
+    void build_hash_buckets(size_t num_main_buckets, int num_hash_funcs);
     void build_sub_buckets(size_t sender_data_size, size_t num_main_buckets, int nh);
     
     // Phase 3: 准备PIR数据库
@@ -85,7 +85,7 @@ public:
     // 真实OT协议 (k-out-of-n OT)
     // receiver_choice_count: Receiver请求的桶数量 (用于构建OT实例)
     // 返回: OT执行是否成功
-    bool prepare_ot_inputs();
+    bool prepare_ot_inputs(size_t receiver_choice_count);
     std::vector<std::vector<Element>> get_ot_inputs() const;
     
     // 获取统计信息

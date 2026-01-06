@@ -55,8 +55,9 @@ echo -e "${BLUE}  run${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
-./bin/lpsi_test -x 4096 -y 1024 -p 1
-# ./bin/lpsi_test -x 256 -y 64 -p 1
+# m=0 direct mode m=1 default mode
+./bin/lpsi_test -x 4096 -y 1024 -p 1 -m 0
+
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}程序运行失败!${NC}"

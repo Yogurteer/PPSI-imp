@@ -82,6 +82,7 @@ set(LPSI_SOURCES
     src/receiver.cpp
     src/oos_ot.cpp
     src/main.cpp
+    src/config.cpp
 )
 
 # OT库源文件
