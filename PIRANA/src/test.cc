@@ -146,9 +146,6 @@ void test_direct_batch_pir_correctness(Server &server,
         uint32_t loc = i; 
 
         if (!is_compress) {
-            // ==============================================
-            // 【关键修复】非压缩模式下的索引计算
-            // ==============================================
             auto N = pir_parms.get_seal_parms().poly_modulus_degree();
             auto num_ct = pir_parms.get_num_payload_slot();
             auto bundle_size = pir_parms.get_bundle_size();

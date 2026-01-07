@@ -74,109 +74,7 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   print_pir_parms();
 }
 
-// // 【修正后的 Direct Mode 构造函数】
-// PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
-//                    const uint64_t num_query, const uint64_t direct_col_size)
-//     : _num_payloads(num_payloads),
-//       _payload_size(payload_size),
-//       _num_query(num_query),
-//       _col_size(direct_col_size),
-//       _is_compress(true), // Direct Mode 通常开启压缩
-//       _enable_rotate(false) {
-
-//   // 1. 恢复 k=2 (PIRANA 核心)
-//   // 注意：请确保头文件 pir_parms.h 中的 _hamming_weight 设 2
-
-//   // 2. 设置 SEAL 参数 (保持4096不变)
-//   // uint64_t poly_degree = 4096;
-//   // std::vector<int> coeff_modulus = {48, 32, 24};
-//   uint64_t poly_degree = 8192; 
-//   std::vector<int> coeff_modulus = {56, 56, 24, 24};
-//   uint64_t plain_prime_len = 18;
-//   set_seal_parms(poly_degree, coeff_modulus, plain_prime_len);
-
-//   _num_payload_slot = std::ceil(payload_size * 8.0 / (plain_prime_len - 1));
-
-//   // 3. 设置 PIRANA 结构参数
-//   uint32_t N = _seal_parms.poly_modulus_degree();
-
-//   _table_size = num_query; // 桶的数量 = 查询数量 (行数)
-//   // 【核心修复】计算需要的 Bundle 数量
-//   // 如果行数超过 N，我们需要多个密文来承载
-//   // 例如: 15360 / 8192 = 1.875 -> 需要 2 个 Bundle
-//   _bundle_size = std::ceil((double)_table_size / N);
-
-//   // 【核心修复】计算 Num Slot (步长)
-//   if (_bundle_size > 1) {
-//       // 如果使用了多个 Bundle，为了保证跨 Bundle 的对齐，强制 stride 为 1
-//       // 这意味着:
-//       // Row 0 -> Bundle 0, Slot 0
-//       // Row 8192 -> Bundle 1, Slot 0
-//       _num_slot = 1; 
-//   } else {
-//       // 只有 1 个 Bundle 的情况 (小规模)
-//       // 保持之前的逻辑: 如果极小则 compact，否则按比例对齐
-//       if (num_query <= N) {
-//           _num_slot = 1; 
-//       } else {
-//           // 这里其实不会执行，因为如果 num_query > N，bundle_size 就会 > 1
-//           // 但为了逻辑完备保留 fallback
-//            double ratio = (double)N / num_query;
-//            uint32_t log2_ratio = 0;
-//            if (ratio >= 1.0) {
-//                log2_ratio = std::floor(std::log2(ratio));
-//            }
-//            _num_slot = 1 << log2_ratio; 
-//       }
-//   }
-  
-//   if (_num_slot == 0) _num_slot = 1;
-
-//   // 4. 【核心修复 - 防止 Segfault】手动构建 "完美" 桶结构
-//   // Server 编码时严重依赖 _bucket 和 _hash_index
-//   // 必须初始化它们，否则 crash！
-  
-//   std::cout << "Direct Mode: Building deterministic buckets..." << std::endl;
-  
-//   _bucket.resize(_table_size); 
-  
-//   for (uint32_t row = 0; row < _table_size; ++row) {
-//       for (uint32_t col = 0; col < _col_size; ++col) {
-//           uint64_t global_idx = row * _col_size + col;
-          
-//           // 边界检查：不要放入超出 num_payloads 的索引
-//           if (global_idx < _num_payloads) {
-//               _bucket[row].push_back(global_idx);
-              
-//               // 【关键】Server 依赖这个 map 来反查元素的列位置
-//               _hash_index[std::to_string(global_idx)] = col;
-//           }
-//       }
-//   }
-
-//   // 5. 【核心修复 - 防止 Segfault】初始化 Codeword 索引表
-//   // k=2 编码必须用到 _cw_index。如果是空的，Server 访问时必定段错误。
-  
-//   _cw_index.resize(_col_size);
-//   _encoding_size = calculate_encoding_size(_col_size); // 计算 m
-  
-//   for (uint64_t index = 0; index < _col_size; index++) {
-//     // 预计算每一列对应的 k=2 组合
-//     _cw_index[index] = get_cw_code_k2(index, _encoding_size);
-//   }
-
-//   // 【验证打印】请确保你在运行日志中能看到下面这几行！
-//   std::cout << "Direct Mode Params Initialized:" << std::endl;
-//   std::cout << "  N: " << N << std::endl;
-//   std::cout << "  Table Size: " << _table_size << std::endl;
-//   std::cout << "  Bundle Size: " << _bundle_size << " (Expect > 1 for Large Query)" << std::endl; 
-//   std::cout << "  Num Slot: " << _num_slot << std::endl;
-  
-//   print_seal_parms();
-//   print_pir_parms();
-// }
-
-// 自定义新PirParms构造函数，适配Direct Mode
+// 适配Direct Mode,自定义新PirParms构造函数
 PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
                    const uint64_t num_query, const uint64_t direct_col_size)
     : _num_payloads(num_payloads),
@@ -186,9 +84,10 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
 
   _enable_rotate = false;
 
-  uint64_t poly_degree = 8192; 
-
-  std::vector<int> coeff_modulus = {56, 56, 24, 24};
+  uint64_t poly_degree = 4096; 
+  std::vector<int> coeff_modulus;
+  if (poly_degree == 4096) coeff_modulus = {48, 32, 24};
+  else if (poly_degree == 8192) coeff_modulus = {56, 56, 24, 24};
   
   // 如果query数量超过多项式维度，禁用压缩
   if (num_query >= poly_degree) {
@@ -206,80 +105,50 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   // 3. 设置 PIRANA 结构参数
   uint32_t N = _seal_parms.poly_modulus_degree();
 
-  _table_size = num_query; // 桶的数量 = 查询数量 (行数)
-  // 【核心修复】计算需要的 Bundle 数量
-  // 如果行数超过 N，我们需要多个密文来承载
-  // 例如: 15360 / 8192 = 1.875 -> 需要 2 个 Bundle
-  _bundle_size = std::ceil((double)_table_size / N);
+  // 如果行数超过 N，我们需要多个密文bundle来承载
+  _bundle_size = std::ceil((double)num_query / N);
 
-  // 【核心修复】计算 Num Slot (步长)
-  if (_bundle_size > 1) {
-      // 如果使用了多个 Bundle，为了保证跨 Bundle 的对齐，强制 stride 为 1
-      // 这意味着:
-      // Row 0 -> Bundle 0, Slot 0
-      // Row 8192 -> Bundle 1, Slot 0
-      _num_slot = 1; 
-  } else {
-      // 只有 1 个 Bundle 的情况 (小规模)
-      // 保持之前的逻辑: 如果极小则 compact，否则按比例对齐
-      if (num_query <= N) {
-          _num_slot = 1; 
-      } else {
-          // 这里其实不会执行，因为如果 num_query > N，bundle_size 就会 > 1
-          // 但为了逻辑完备保留 fallback
-           double ratio = (double)N / num_query;
-           uint32_t log2_ratio = 0;
-           if (ratio >= 1.0) {
-               log2_ratio = std::floor(std::log2(ratio));
-           }
-           _num_slot = 1 << log2_ratio; 
-      }
+  if (_is_compress == false) {
+    // One response ciphertext only has one slot payload in each bucket;
+    _num_slot = 1;
+    _table_size = _bundle_size * N;
   }
-  
-  if (_num_slot == 0) _num_slot = 1;
+  else {
+    _table_size = static_cast<uint32_t>(num_query);
+    assert(_table_size < N);
+    _num_slot = std::floor(N / _table_size);
+    _table_size = std::floor(N / _num_slot);
+    _bundle_size = 1;
+  }
 
-  // 4. 【核心修复 - 防止 Segfault】手动构建 "完美" 桶结构
-  // Server 编码时严重依赖 _bucket 和 _hash_index
-  // 必须初始化它们，否则 crash！
-  
   std::cout << "Direct Mode: Building deterministic buckets..." << std::endl;
   
-  _bucket.resize(_table_size); 
-  
-  for (uint32_t row = 0; row < _table_size; ++row) {
-      for (uint32_t col = 0; col < _col_size; ++col) {
-          uint64_t global_idx = row * _col_size + col;
-          
-          // 边界检查：不要放入超出 num_payloads 的索引
-          if (global_idx < _num_payloads) {
-              _bucket[row].push_back(global_idx);
-              
-              // 【关键】Server 依赖这个 map 来反查元素的列位置
-              _hash_index[std::to_string(global_idx)] = col;
-          }
-      }
-  }
+  _bucket.resize(_table_size);
+  // 已知num_payloads<= _table_size * _col_size
+  for (uint64_t index = 0; index < num_payloads; index++) {
+    auto row_idx = index/_col_size; // 计算该索引所在的行号
 
-  // 5. 【核心修复 - 防止 Segfault】初始化 Codeword 索引表
-  // k=2 编码必须用到 _cw_index。如果是空的，Server 访问时必定段错误。
+    _bucket[row_idx].push_back(index);
+    if (_hash_index.count(std::to_string(index * _table_size + row_idx)) !=
+        0) {
+      std::cout << "hash string error: " << index << std::endl;
+    }
+    assert(_hash_index.count(
+                std::to_string(index * _table_size + row_idx)) == 0);
+    _hash_index[std::to_string(index * _table_size + row_idx)] =
+        _bucket[row_idx].size() - 1;
+  } 
   
+  // k=2 编码必须用到 _cw_index。如果是空的，Server 访问时必定段错误。
   _cw_index.resize(_col_size);
   _encoding_size = calculate_encoding_size(_col_size); // 计算 m
   
   for (uint64_t index = 0; index < _col_size; index++) {
-    // 预计算每一列对应的 k=2 组合
     _cw_index[index] = get_cw_code_k2(index, _encoding_size);
   }
-
-  // 【验证打印】请确保你在运行日志中能看到下面这几行！
-  std::cout << "Direct Mode Params Initialized:" << std::endl;
-  std::cout << "  N: " << N << std::endl;
-  std::cout << "  Table Size: " << _table_size << std::endl;
-  std::cout << "  Bundle Size: " << _bundle_size << " (Expect > 1 for Large Query)" << std::endl; 
-  std::cout << "  Num Slot: " << _num_slot << std::endl;
   
-  print_seal_parms();
-  print_pir_parms();
+  // print_seal_parms();
+  // print_pir_parms();
 }
 
 void PirParms::set_seal_parms(uint64_t poly_degree,
@@ -430,7 +299,11 @@ void PirParms::print_pir_parms() {
             << std::endl;
   std::cout << "|   Number of payload slot: " << _num_payload_slot << std::endl;
   std::cout << "|   Number of query (L): " << _num_query << std::endl;
+  std::cout << "|   Is compress: " << _is_compress << std::endl;
+  // print _num_slot
+  std::cout << "|   Num slot: " << _num_slot << std::endl;
   std::cout << "|   Col Size: " << _col_size << std::endl;
+  std::cout << "|   Table Size : " << _table_size << std::endl;
 
   std::cout << "|   Hamming weight (k): " << _hamming_weight << std::endl;
   std::cout << "|   Encoding size (m): " << _encoding_size << std::endl;

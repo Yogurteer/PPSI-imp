@@ -853,61 +853,50 @@ std::stringstream Server::gen_batch_response(std::stringstream &query_stream) {
 };
 
 std::stringstream Server::gen_direct_batch_response_no_cuckoo(std::stringstream &query_stream) {
-  std::cout << "Server: Generating Direct Batch Response (Slice & Process)..." << std::endl;
+  std::cout << "Server: Generating Direct Batch Response (Direct Mode)..." << std::endl;
 
   auto bundle_size = _pir_parms.get_bundle_size();
   auto encoding_size = _pir_parms.get_encoding_size(); 
   auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
   auto col_size = _pir_parms.get_col_size();
 
-  // 1. 加载所有查询
-  // 大小: m * bundle_size
+  // 1. 加载所有查询 (大小: encoding_size * bundle_size)
+  // Client 布局: [m0_b0, m0_b1, m1_b0, m1_b1, ..., m(m-1)_b0, m(m-1)_b1]
   std::vector<seal::Ciphertext> all_queries = 
       load_query(query_stream, encoding_size * bundle_size);
 
+  // 2. 生成选择向量 (使用完整的查询，不切分)
+  // gen_selection_vector_batch 期望输入: encoding_size * bundle_size
+  // 输出: col_size * bundle_size
+  std::vector<seal::Ciphertext> selection_vector = 
+      gen_selection_vector_batch(all_queries);
+
   std::stringstream response;
 
-  // 2. 遍历每一个 Bundle (独立处理)
-  for (uint32_t b = 0; b < bundle_size; b++) {
+  // 3. 计算内积 (遍历 Payload 分片 -> Bundle -> 列)
+  // 输出顺序: [Payload0_Bundle0, Payload0_Bundle1, ..., Payload1_Bundle0, ...]
+  for (uint64_t pl = 0; pl < compress_num_slot; pl++) {
       
-      // A. 从总查询中切分出当前 Bundle 的查询向量
-      // 范围: [b*m, (b+1)*m)
-      std::vector<seal::Ciphertext> sub_query;
-      sub_query.reserve(encoding_size);
-      
-      uint32_t start_idx = b * encoding_size;
-      for(uint32_t k=0; k<encoding_size; ++k) {
-          sub_query.push_back(all_queries[start_idx + k]);
-      }
-      
-      // B. 调用原生函数生成选择向量
-      // 这会处理 k=2, multiply, relinearize 等所有复杂逻辑
-      // 返回结果大小: col_size
-      std::vector<seal::Ciphertext> selection_vector = 
-          gen_selection_vector_batch(sub_query);
-
-      // C. 手动内积 (针对特定 Bundle 的 DB 数据)
-      // 这里的逻辑类似 inner_product，但我们需要锁定 bundle index = b
-      
-      // C1. 遍历 Payload 分片
-      for (uint64_t pl = 0; pl < compress_num_slot; pl++) {
+      // 遍历每一个 Bundle
+      for (uint32_t b = 0; b < bundle_size; b++) {
           
           seal::Ciphertext sum;
           bool first = true;
           
-          // C2. 遍历列
+          // 遍历每一列
           for (uint64_t col = 0; col < col_size; col++) {
               
-              // 这里的 selection_vector[col] 就是当前 Bundle 的第 col 列的选择信号
+              // 【关键修复】选择向量的索引
+              // selection_vector 布局: [Col0_B0, Col0_B1, Col1_B0, Col1_B1, ...]
+              // 对于第 col 列的第 b 个 Bundle: col * bundle_size + b
+              uint64_t sel_idx = col * bundle_size + b;
               
-              // 获取 DB 中对应位置的数据
-              // DB Layout: [Payload][Col][Bundle]
+              // 数据库索引
+              // DB 布局: [Payload][Col][Bundle]
               uint64_t db_idx = (pl * col_size * bundle_size) + (col * bundle_size) + b;
               
               seal::Ciphertext prod;
-              // 此时 selection_vector 是密文(NTT), _encoded_db 是明文(NTT)
-              // 安全乘法
-              _evaluator->multiply_plain(selection_vector[col], _encoded_db[db_idx], prod);
+              _evaluator->multiply_plain(selection_vector[sel_idx], _encoded_db[db_idx], prod);
               
               if (first) {
                   sum = prod;
@@ -917,7 +906,7 @@ std::stringstream Server::gen_direct_batch_response_no_cuckoo(std::stringstream 
               }
           }
           
-          // D. 后处理
+          // 后处理: NTT 逆变换 + 模数切换
           _evaluator->transform_from_ntt_inplace(sum);
           while (sum.parms_id() != _context->last_parms_id()) {
                _evaluator->mod_switch_to_next_inplace(sum);

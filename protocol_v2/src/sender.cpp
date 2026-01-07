@@ -315,9 +315,8 @@ void LPSISender::build_sub_buckets(size_t sender_data_size, size_t num_main_buck
     // 每个主桶有nh个子桶,每个子桶的容量 = (主桶元素数 / nh) * 负载因子
     // 使用配置的因子计算容量
     size_t sub_bucket_capacity = static_cast<size_t>(std::ceil(max_main_bucket_size * LPSIConfig::SUB_BUCKET_FACTOR));
-    
-    // 确保最小容量
-    sub_bucket_capacity = std::max(sub_bucket_capacity, size_t(20));
+    // print SUB_BUCKET_FACTOR
+    std::cout << "[子桶容量] 使用 SUB_BUCKET_FACTOR = " << LPSIConfig::SUB_BUCKET_FACTOR << std::endl;
     
     std::cout << "[子桶容量] 子桶容量计算: " 
               << "max_bucket_size=" << max_main_bucket_size
@@ -484,7 +483,7 @@ void LPSISender::prepare_pir_database() {
 std::vector<Element> LPSISender::get_pir_database_as_bytes(size_t& num_items, size_t& item_size) {
     num_items = flattened_database.size();
     // item_size = 128;
-    item_size = LPSIConfig::PIR_ITEM_SIZE;  // 使用配置文件中的值
+    item_size = LPSIConfig::PIR_PAYLOAD_SIZE;  // 使用配置文件中的值
     
     std::vector<Element> result;
     

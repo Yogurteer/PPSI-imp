@@ -37,8 +37,9 @@ std::stringstream Client::gen_direct_batch_query(
   // 如果这里少了 bundle_size，Server 就会越界！
   auto query_ct_size = encoding_size * bundle_size;
   
-  // 
-  // 布局: [Bundle 0 的 m 个密文] [Bundle 1 的 m 个密文]
+  // 【关键修复】布局必须是交错的，与 gen_selection_vector_batch 的期望一致
+  // 正确布局: [m0_b0, m0_b1, m1_b0, m1_b1, ..., m(m-1)_b0, m(m-1)_b1]
+  // 错误布局: [m0_b0, m1_b0, ..., m(m-1)_b0, m0_b1, m1_b1, ..., m(m-1)_b1]
   std::vector<std::vector<uint64_t>> cw_query(query_ct_size,
                                               std::vector<uint64_t>(_N, 0));
 
@@ -56,15 +57,16 @@ std::stringstream Client::gen_direct_batch_query(
         uint32_t slot_idx = absolute_pos % _N;
 
         if (bundle_idx < bundle_size) {
-            // 计算在扁平向量中的基准偏移
-            // 如果是 Bundle 1，偏移量就是 1 * 7 = 7
-            uint32_t base_idx = bundle_idx * encoding_size;
-            
+            // 【关键修复】使用交错索引而不是分块索引
+            // 对于编码 cw.first 的第 bundle_idx 个 bundle:
+            // 索引 = cw.first * bundle_size + bundle_idx
             if (cw.first < encoding_size) {
-                cw_query.at(base_idx + cw.first).at(slot_idx) = 1;
+                uint32_t interleaved_idx = cw.first * bundle_size + bundle_idx;
+                cw_query.at(interleaved_idx).at(slot_idx) = 1;
             }
             if (cw.second < encoding_size) {
-                cw_query.at(base_idx + cw.second).at(slot_idx) = 1;
+                uint32_t interleaved_idx = cw.second * bundle_size + bundle_idx;
+                cw_query.at(interleaved_idx).at(slot_idx) = 1;
             }
         }
       }
