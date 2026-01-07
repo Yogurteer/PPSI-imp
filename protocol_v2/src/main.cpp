@@ -749,7 +749,7 @@ int main(int argc, char** argv) {
             case 'p':
                 payload_size = std::stoul(optarg);
 
-                LPSIConfig::PIR_PAYLOAD_SIZE = 128; // label byte length
+                LPSIConfig::PIR_PAYLOAD_SIZE = 256; // label byte length
                 break;
             case 'm':
                 // 1-default mode, 0-direct mode
