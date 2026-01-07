@@ -343,12 +343,21 @@ void phase3_prepare_pir(
     size_t sender_num_main_buckets = sender.get_num_main_buckets();
     auto [sender_nh, sender_sub_capacity] = sender.get_sub_bucket_structure();
     
-    // Receiver生成查询索引
-    receiver.generate_pir_query_indices(sender_num_main_buckets, sender_nh, sender_sub_capacity);
-    
-    // 获取数据库和查询
+    // 获取数据库 (先获取,以便知道实际大小)
     size_t num_items;
     database = sender.get_pir_database_as_bytes(num_items, item_size);
+    
+    // **关键修复**: 计算实际的row_size (可能与sub_capacity不同)
+    size_t actual_num_rows = sender_num_main_buckets * sender_nh;
+    size_t actual_row_size = (num_items + actual_num_rows - 1) / actual_num_rows;  // 向上取整
+    
+    std::cout << "[DEBUG] 原始sub_capacity=" << sender_sub_capacity 
+              << ", 实际row_size=" << actual_row_size 
+              << ", database.size()=" << num_items << std::endl;
+    
+    // Receiver使用实际的row_size生成查询索引
+    receiver.generate_pir_query_indices(sender_num_main_buckets, sender_nh, actual_row_size);
+    
     queries = receiver.get_query_indices_flat();
     
     // std::cout << "✓ PIR数据库: " << num_items << " 项, 每项 " << item_size << " 字节" << std::endl;
@@ -418,8 +427,8 @@ void simulate_pir(
     
     for(size_t i = 0; i < queries.size(); ++i) {
         uint32_t query_idx = queries[i];
-        // **关键修复**: 检查索引是否超出实际数据范围
-        size_t actual_db_size = num_rows * row_size;
+        // **关键修复**: 使用实际数据库大小而非理论容量
+        size_t actual_db_size = database.size();
         if (query_idx >= actual_db_size) {
             // 返回全0的payload（表示未找到）
             std::vector<unsigned char> empty(item_size, 0);
@@ -623,14 +632,35 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     auto dur_pir = batch_pir_online_time; // 转换为毫秒
     
     // --- 模拟PIR与验证 (不计入时间) ---
+    size_t sender_num_main_buckets_check = sender.get_num_main_buckets();
+    auto [sender_nh_check, sender_sub_capacity_check] = sender.get_sub_bucket_structure();
+    std::cout << "[DEBUG] database.size() = " << database.size() << std::endl;
+    std::cout << "[DEBUG] queries.size() = " << queries.size() << std::endl;
+    std::cout << "[DEBUG] num_rows = " << (sender_num_main_buckets_check * sender_nh_check) 
+              << ", row_size = " << sender_sub_capacity_check << std::endl;
+    
     simulate_pir(receiver, sender, database, queries, item_size);
     bool pir_match = true;
-    if (receiver.sim_pir_results.size() != receiver.pir_results.size()) pir_match = false;
+    size_t mismatch_count = 0;
+    if (receiver.sim_pir_results.size() != receiver.pir_results.size()) {
+        pir_match = false;
+        std::cout << "[DEBUG] 大小不匹配: sim=" << receiver.sim_pir_results.size() 
+                  << ", actual=" << receiver.pir_results.size() << std::endl;
+    }
     else {
         for (size_t i = 0; i < receiver.sim_pir_results.size(); ++i) {
             if (receiver.sim_pir_results[i] != receiver.pir_results[i]) {
-                pir_match = false; break;
+                pir_match = false;
+                mismatch_count++;
+                if (mismatch_count <= 3) {  // 只打印前3个不匹配的
+                    std::cout << "[DEBUG] 不匹配[" << i << "]: query_idx=" << queries[i] 
+                              << ", sim[0]=" << (int)receiver.sim_pir_results[i][0]
+                              << ", actual[0]=" << (int)receiver.pir_results[i][0] << std::endl;
+                }
             }
+        }
+        if (mismatch_count > 0) {
+            std::cout << "[DEBUG] 总共 " << mismatch_count << " 个不匹配项" << std::endl;
         }
     }
     std::cout << "[PIR外部验证] 模拟与实际结果匹配: " << (pir_match ? "YES" : "NO") << std::endl;
@@ -735,7 +765,7 @@ int main(int argc, char** argv) {
     size_t sender_size = 4096;   // 默认 2^12
     size_t receiver_size = 1024;  // 默认 2^8
     size_t payload_size = 1;     // 默认 1 byte
-    size_t is_default_mode = 1; // 默认使用 Default Mode
+    size_t is_default_mode = 0; // 默认使用 Default Mode
     
     int opt;
     while ((opt = getopt(argc, argv, "x:y:p:m:h")) != -1) {
@@ -772,12 +802,10 @@ int main(int argc, char** argv) {
 
     // 运行主逻辑
     std::string batch_PIR_mode = "direct"; // "default" or "direct"
-    if (receiver_size == 1) {
+    if (receiver_size == 1 || is_default_mode == 1) {
         batch_PIR_mode = "default"; // 单元素查询使用默认模式
     }
-    if (is_default_mode == 1) {
-        batch_PIR_mode = "default";
-    }
+
     run_main(sender_size, receiver_size, payload_size, batch_PIR_mode);
     
     return 0;

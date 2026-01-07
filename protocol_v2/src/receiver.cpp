@@ -599,6 +599,10 @@ void LPSIReceiver::process_pir_results(const std::vector<Element>& results) {
     }
     
     std::cout << "总计: 命中 " << hit_element_indices.size() << "/" << Y_prime.size() << " 个元素" << std::endl;
+
+    if(hit_element_indices.size()!=Y_prime.size()){
+        throw std::runtime_error("命中元素数与预期大小不匹配");
+    }
 }
 
 // Phase 5: 获取OT选择索引

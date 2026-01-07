@@ -83,8 +83,9 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
       _col_size(direct_col_size){
 
   _enable_rotate = false;
+  _is_direct_mode = true;
 
-  uint64_t poly_degree = 4096; 
+  uint64_t poly_degree = 8192; 
   std::vector<int> coeff_modulus;
   if (poly_degree == 4096) coeff_modulus = {48, 32, 24};
   else if (poly_degree == 8192) coeff_modulus = {56, 56, 24, 24};

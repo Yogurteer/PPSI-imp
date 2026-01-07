@@ -62,7 +62,15 @@ Server::Server(PirParms &pir_parms, bool is_batch, bool random_db, std::vector<s
     _raw_db = input_db;
     _set_db = true;
   }
-  if (_pir_parms.get_is_compress()) {
+  
+  // 判断是否是Direct Mode: 如果pir_parms已经构建了bucket,说明是Direct Mode
+  bool is_direct_mode = _pir_parms._is_direct_mode;
+  
+  if (is_direct_mode) {
+    // Direct Mode使用专门的编码函数
+    std::cout << "Using direct_encode_to_ntt_db() for Direct Mode" << std::endl;
+    direct_encode_to_ntt_db();
+  } else if (_pir_parms.get_is_compress()) {
     batch_encode_to_ntt_db_with_compress();
   } else {
     batch_encode_to_ntt_db_without_compress();
@@ -306,68 +314,92 @@ void Server::direct_encode_to_ntt_db() {
   std::cout << "Direct Encoding database (No Cuckoo)!" << std::endl;
 
   auto compress_num_slot = _pir_parms.get_batch_pir_num_compress_slot();
-  auto db_pt_size = _pir_parms.get_col_size() * compress_num_slot;
+  auto bundle_size = _pir_parms.get_bundle_size();
+  auto col_size = _pir_parms.get_col_size();
+  auto db_pt_size = col_size * compress_num_slot * bundle_size;
   
   auto num_rows = _pir_parms.get_table_size(); 
   uint32_t num_slot = _pir_parms.get_num_slot();
   
-  // 获取是否压缩的标志
+  // 获取是否压缩的标志以及bucket结构
   bool is_compress = _pir_parms.get_is_compress();
+  auto bucket = _pir_parms.get_bucket();
 
   _encoded_db.resize(db_pt_size);
-  std::vector<uint64_t> plain_vector(_N, 0);
 
-  // 1. 遍历每一列 (col_index)
-  for (uint64_t col_index = 0; col_index < _pir_parms.get_col_size(); col_index++) {
+  // 【关键修复】布局必须与 gen_direct_batch_response_no_cuckoo 一致:
+  // DB 布局: [Payload][Col][Bundle]
+  // 索引: (pl * col_size * bundle_size) + (col * bundle_size) + b
+  
+  // 1. 遍历 Payload 的分片 (pl_slot_index)
+  for (uint64_t pl_slot_index = 0; pl_slot_index < compress_num_slot; pl_slot_index++) {
       
-    // 2. 遍历 Payload 的分片 (pl_slot_index)
-    // 如果不压缩，这里会遍历 0 到 63
-    for (uint64_t pl_slot_index = 0; pl_slot_index < compress_num_slot; pl_slot_index++) {
+    // 2. 遍历每一列 (col_index)
+    for (uint64_t col_index = 0; col_index < col_size; col_index++) {
         
-      seal::Plaintext encoded_plain;
-      
-      // 3. 遍历每一行 (i)
-      for (uint32_t i = 0; i < num_rows; i++) {
+      // 3. 遍历每个 Bundle
+      for (uint32_t bundle_idx = 0; bundle_idx < bundle_size; bundle_idx++) {
           
-          uint64_t raw_db_index = i * _pir_parms.get_col_size() + col_index;
+        std::vector<uint64_t> plain_vector(_N, 1); // 默认填充 1 (Dummy)
+        
+        // 4. 遍历该 Bundle 负责的行范围
+        uint32_t start_row = bundle_idx * _N;
+        uint32_t end_row = std::min((uint64_t)(start_row + _N), (uint64_t)num_rows);
+        
+        for (uint32_t i = start_row; i < end_row; i++) {
+            
+            // 【关键修复】从bucket中获取该行第col_index列的真实payload索引
+            // bucket[i] 是第 i 行的所有payload索引列表
+            uint64_t raw_db_index;
+            if (col_index < bucket.at(i).size()) {
+                raw_db_index = bucket.at(i).at(col_index);
+            } else {
+                // 该行该列没有数据,使用dummy填充(plain_vector默认已经是1)
+                continue; // 跳过这一行的填充,保持dummy值
+            }
+            
+            // 5. 填充该行对应的多项式系数
+            if (is_compress) {
+                // 压缩模式：每行包含 num_slot 个连续slot数据
+                for (uint32_t slot = 0; slot < num_slot; slot++) {
+                    uint64_t local_poly_idx = (i - start_row) * num_slot + slot;
+                    uint64_t inner_slot_idx = pl_slot_index * num_slot + slot;
+                    
+                    if (local_poly_idx < _N && raw_db_index < _raw_db.size()) {
+                        if (inner_slot_idx < _raw_db.at(raw_db_index).size()) {
+                            uint64_t val = _raw_db.at(raw_db_index).at(inner_slot_idx);
+                            plain_vector.at(local_poly_idx) = val;
+                        } else {
+                            plain_vector.at(local_poly_idx) = 1; // Dummy
+                        }
+                    }
+                }
+            } else {
+                // 非压缩模式：每行只包含1个slot数据
+                uint64_t local_poly_idx = (i - start_row);
+                uint64_t inner_slot_idx = pl_slot_index;
+                
+                if (local_poly_idx < _N && raw_db_index < _raw_db.size()) {
+                    if (inner_slot_idx < _raw_db.at(raw_db_index).size()) {
+                        uint64_t val = _raw_db.at(raw_db_index).at(inner_slot_idx);
+                        plain_vector.at(local_poly_idx) = val;
+                    } else {
+                        plain_vector.at(local_poly_idx) = 1; // Dummy
+                    }
+                }
+            }
+        }
 
-          // 4. 遍历分配给该行的多项式系数 (slot)
-          for (uint32_t slot = 0; slot < num_slot; slot++) {
-             uint64_t poly_idx = i * num_slot + slot;
-             
-             // 【关键修复】根据是否压缩，计算不同的内部索引
-             uint64_t inner_slot_idx;
-             
-             if (is_compress) {
-                 // 压缩模式：多个Payload分片挤在一个密文中，需要跳跃
-                 inner_slot_idx = pl_slot_index * num_slot + slot;
-             } else {
-                 // 非压缩模式：当前密文只对应 Payload 的第 pl_slot_index 个分片
-                 // slot 仅仅是多项式系数的冗余（或者只有 slot=0 被使用，视 Client 实现而定）
-                 // 这里我们简单地取同一个值
-                 inner_slot_idx = pl_slot_index;
-             }
-
-             if (poly_idx < _N && raw_db_index < _raw_db.size()) {
-                 // 边界检查：防止 inner_slot_idx 越界 (针对压缩模式末尾对齐的情况)
-                 if (inner_slot_idx < _raw_db.at(raw_db_index).size()) {
-                     uint64_t val = _raw_db.at(raw_db_index).at(inner_slot_idx);
-                     plain_vector.at(poly_idx) = val;
-                 } else {
-                     plain_vector.at(poly_idx) = 0; // Padding
-                 }
-             } else {
-                 if (poly_idx < _N) {
-                    plain_vector.at(poly_idx) = 1; // Dummy element (Row padding)
-                 }
-             }
-          }
+        seal::Plaintext encoded_plain;
+        _batch_encoder->encode(plain_vector, encoded_plain);
+        _evaluator->transform_to_ntt_inplace(encoded_plain, _context->first_parms_id());
+        
+        // 【关键修复】按照 [Payload][Col][Bundle] 的顺序存储
+        uint64_t db_idx = (pl_slot_index * col_size * bundle_size) + 
+                          (col_index * bundle_size) + 
+                          bundle_idx;
+        _encoded_db.at(db_idx) = encoded_plain;
       }
-
-      _batch_encoder->encode(plain_vector, encoded_plain);
-      _evaluator->transform_to_ntt_inplace(encoded_plain, _context->first_parms_id());
-      
-      _encoded_db.at(pl_slot_index * _pir_parms.get_col_size() + col_index) = encoded_plain;
     }
   }
   std::cout << "Direct Encoding END!" << std::endl;

@@ -9,7 +9,7 @@ NC='\033[0m' # No Color
 
 # ================= 配置区域 =================
 # Sender 规模: 2^8(256), 2^12(4096), 2^16(65536) 2^20 2^24
-SENDER_SIZES=(1048576 16777216)
+SENDER_SIZES=(256 4096 65536 1048576 16777216)
 # SENDER_SIZES=(16777216)
 
 # Receiver 规模: 1, 2^6(64), 2^7(128), 2^8(256), 2^9(512), 2^10(1024)
@@ -90,7 +90,7 @@ for x in "${SENDER_SIZES[@]}"; do
 
         # 运行程序，捕获 stdout 和 stderr (2>&1)
         # 这样即使是 Segmentation fault 也能被 OUTPUT 捕获到一部分信息
-        OUTPUT=$(./bin/lpsi_test -x "$x" -y "$y" -p "$PAYLOAD_SIZE" 2>&1)
+        OUTPUT=$(./bin/lpsi_test -x "$x" -y "$y" -p "$PAYLOAD_SIZE" -m 0 2>&1)
         RET_CODE=$?
 
         if [ $RET_CODE -ne 0 ]; then

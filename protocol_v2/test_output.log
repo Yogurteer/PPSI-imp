@@ -1,0 +1,1572 @@
+[0;34m========================================[0m
+[0;34m  可计费LPSI协议 - 编译和运行[0m
+[0;34m========================================[0m
+[0;32m创建build目录...[0m
+[0;32m运行CMake配置...[0m
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  
+-- Found OpenMP_C: -fopenmp (found version "4.5") 
+-- Found OpenMP_CXX: -fopenmp (found version "4.5") 
+-- Found OpenMP: TRUE (found version "4.5")  
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Microsoft SEAL -> Version 4.1.2 detected
+-- Microsoft SEAL -> Targets available: SEAL::seal
+-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system thread 
+-- Microsoft Kuku: found
+-- Build type: Release
+-- C++ standard: 20
+-- OpenSSL version: 3.0.2
+-- SEAL found: 1
+-- Kuku found: 1
+-- libOTe directory: /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe
+-- libOTe build directory: /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/build/linux
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/build
+[0;32m开始编译...[0m
+[ 15%] Building CXX object CMakeFiles/lpsi_test.dir/src/receiver.cpp.o
+[ 15%] Building CXX object CMakeFiles/lpsi_test.dir/src/oos_ot.cpp.o
+[ 23%] Building CXX object CMakeFiles/lpsi_test.dir/src/main.cpp.o
+[ 30%] Building CXX object CMakeFiles/lpsi_test.dir/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/pir_parms.cc.o
+[ 38%] Building CXX object CMakeFiles/lpsi_test.dir/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/client.cc.o
+[ 46%] Building CXX object CMakeFiles/lpsi_test.dir/src/sender.cpp.o
+[ 53%] Building CXX object CMakeFiles/lpsi_test.dir/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/batch_pir.cc.o
+[ 61%] Building CXX object CMakeFiles/lpsi_test.dir/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc.o
+[ 84%] Building CXX object CMakeFiles/lpsi_test.dir/thirdparty/oos_OT/oos_OT.cpp.o
+[ 84%] Building CXX object CMakeFiles/lpsi_test.dir/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/server.cc.o
+[ 69%] Building CXX object CMakeFiles/lpsi_test.dir/src/config.cpp.o
+[ 92%] Building CXX object CMakeFiles/lpsi_test.dir/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc.o
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/sender.h:11,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/sender.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/common.h: In function ‘EC_POINT* map_data_to_point(const EC_GROUP*, const Element&, BN_CTX*)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/common.h:158:52: warning: ‘int EC_POINT_set_compressed_coordinates_GFp(const EC_GROUP*, EC_POINT*, const BIGNUM*, int, BN_CTX*)’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  158 |         if (EC_POINT_set_compressed_coordinates_GFp(group, point, x_coord, 0, ctx) == 1) {
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/common.h:7,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/sender.h:11,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/sender.cpp:1:
+/usr/include/openssl/ec.h:686:27: note: declared here
+  686 | OSSL_DEPRECATEDIN_3_0 int EC_POINT_set_compressed_coordinates_GFp
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/receiver.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/receiver.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/common.h: In function ‘EC_POINT* map_data_to_point(const EC_GROUP*, const Element&, BN_CTX*)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/common.h:158:52: warning: ‘int EC_POINT_set_compressed_coordinates_GFp(const EC_GROUP*, EC_POINT*, const BIGNUM*, int, BN_CTX*)’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  158 |         if (EC_POINT_set_compressed_coordinates_GFp(group, point, x_coord, 0, ctx) == 1) {
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/common.h:7,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/receiver.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/receiver.cpp:1:
+/usr/include/openssl/ec.h:686:27: note: declared here
+  686 | OSSL_DEPRECATEDIN_3_0 int EC_POINT_set_compressed_coordinates_GFp
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/sender.h:11,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/main.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/common.h: In function ‘EC_POINT* map_data_to_point(const EC_GROUP*, const Element&, BN_CTX*)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/common.h:158:52: warning: ‘int EC_POINT_set_compressed_coordinates_GFp(const EC_GROUP*, EC_POINT*, const BIGNUM*, int, BN_CTX*)’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  158 |         if (EC_POINT_set_compressed_coordinates_GFp(group, point, x_coord, 0, ctx) == 1) {
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/common.h:7,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/include/sender.h:11,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/main.cpp:1:
+/usr/include/openssl/ec.h:686:27: note: declared here
+  686 | OSSL_DEPRECATEDIN_3_0 int EC_POINT_set_compressed_coordinates_GFp
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/NcoOtExt.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Common/MatrixView.h:79:9: warning: type qualifiers ignored on function return type [-Wignored-qualifiers]
+   79 |         const size_type size() const { return mView.size(); }
+      |         ^~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Common/MatrixView.h:80:9: warning: type qualifiers ignored on function return type [-Wignored-qualifiers]
+   80 |         const size_type stride() const { return mStride; }
+      |         ^~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/NcoOtExt.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:2:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Common/MatrixView.h:79:9: warning: type qualifiers ignored on function return type [-Wignored-qualifiers]
+   79 |         const size_type size() const { return mView.size(); }
+      |         ^~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Common/MatrixView.h:80:9: warning: type qualifiers ignored on function return type [-Wignored-qualifiers]
+   80 |         const size_type stride() const { return mStride; }
+      |         ^~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc: In function ‘std::pair<unsigned int, unsigned int> get_cw_code_k2(uint64_t, uint64_t)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc:87:19: warning: comparison of integer expressions of different signedness: ‘int64_t’ {aka ‘long int’} and ‘uint64_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+   87 |     if (remainder >= choose(pointer, k_prime))
+      |         ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc:80:12: warning: unused variable ‘mod_size’ [-Wunused-variable]
+   80 |   uint64_t mod_size = choose(encoding_size, hamming_weight);
+      |            ^~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc: In function ‘std::vector<unsigned int> get_perfect_constant_weight_codeword(uint64_t, uint64_t, uint64_t)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc:115:19: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘uint64_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+  115 |     if (remainder >= choose(pointer, k_prime))
+      |         ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc:108:12: warning: unused variable ‘mod_size’ [-Wunused-variable]
+  108 |   uint32_t mod_size = choose(encoding_size, hamming_weight);
+      |            ^~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc: In function ‘void tran_to_multiply_mid_form_inplace(const seal::SEALContext&, seal::Ciphertext&, seal::MemoryPoolHandle)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc:162:12: warning: unused variable ‘plain_modulus’ [-Wunused-variable]
+  162 |   uint64_t plain_modulus = parms.plain_modulus().value();
+      |            ^~~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc:169:8: warning: variable ‘base_q’ set but not used [-Wunused-but-set-variable]
+  169 |   auto base_q = seal::util::iter(parms.coeff_modulus());
+      |        ^~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc:170:8: warning: variable ‘base_Bsk’ set but not used [-Wunused-but-set-variable]
+  170 |   auto base_Bsk = seal::util::iter(rns_tool->base_Bsk()->base());
+      |        ^~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc: In instantiation of ‘multiply(const seal::SEALContext&, seal::Ciphertext&, const seal::Ciphertext&, seal::Ciphertext&, seal::MemoryPoolHandle)::<lambda(auto:65)> [with auto:65 = long unsigned int]’:
+/usr/include/c++/11/bits/stl_algo.h:3820:5:   required from ‘constexpr _Funct std::for_each(_IIter, _IIter, _Funct) [with _IIter = seal::util::SeqIter<long unsigned int, void>; _Funct = multiply(const seal::SEALContext&, seal::Ciphertext&, const seal::Ciphertext&, seal::Ciphertext&, seal::MemoryPoolHandle)::<lambda(auto:65)>]’
+/usr/include/c++/11/bits/stl_algo.h:3849:4:   required from ‘constexpr _InputIterator std::for_each_n(_InputIterator, _Size, _Function) [with _InputIterator = seal::util::SeqIter<long unsigned int, void>; _Size = long unsigned int; _Function = multiply(const seal::SEALContext&, seal::Ciphertext&, const seal::Ciphertext&, seal::Ciphertext&, seal::MemoryPoolHandle)::<lambda(auto:65)>]’
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc:368:221:   required from here
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/utils.cc:334:12: warning: unused variable ‘curr_encrypted2_last’ [-Wunused-variable]
+  334 |     size_t curr_encrypted2_last = I - curr_encrypted1_last;
+      |            ^~~~~~~~~~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/client.cc: In member function ‘std::stringstream Client::gen_batch_query(const std::vector<unsigned int>&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/client.cc:138:12: warning: unused variable ‘query_size’ [-Wunused-variable]
+  138 |   uint64_t query_size = _pir_parms.get_num_query();
+      |            ^~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/server.cc: In member function ‘void Server::gen_random_db()’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/server.cc:85:8: warning: unused variable ‘plain_modulus’ [-Wunused-variable]
+   85 |   auto plain_modulus = _pir_parms.get_seal_parms().plain_modulus().value();
+      |        ^~~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/server.cc: In member function ‘bool Server::read_db_from_file(const string&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/server.cc:150:12: warning: unused variable ‘plain_mask’ [-Wunused-variable]
+  150 |   uint64_t plain_mask = (1ULL << bits_per_slot) - 1;
+      |            ^~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc: In function ‘void test_pir_correctness(Server&, std::vector<std::vector<long unsigned int> >&, uint32_t, PirParms&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc:32:14: warning: unused variable ‘response_item’ [-Wunused-variable]
+   32 |         auto response_item = answer[i][index % N];
+      |              ^~~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc:33:14: warning: unused variable ‘plain_item’ [-Wunused-variable]
+   33 |         auto plain_item = real_item[count];
+      |              ^~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc:43:14: warning: unused variable ‘response_item’ [-Wunused-variable]
+   43 |         auto response_item = answer[i][index % N];
+      |              ^~~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc:44:14: warning: unused variable ‘plain_item’ [-Wunused-variable]
+   44 |         auto plain_item = real_item[count];
+      |              ^~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc:15:8: warning: unused variable ‘start_rows’ [-Wunused-variable]
+   15 |   auto start_rows = index % N;
+      |        ^~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc: In function ‘void test_direct_batch_pir_correctness(Server&, std::vector<std::vector<long unsigned int> >&, const std::vector<unsigned int>&, PirParms&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc:135:10: warning: unused variable ‘num_payload_slot’ [-Wunused-variable]
+  135 |     auto num_payload_slot = pir_parms.get_num_payload_slot();
+      |          ^~~~~~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc: In function ‘void test_mulptiply(seal::SEALContext&, seal::EncryptionParameters&, seal::Encryptor&, seal::Decryptor&, seal::BatchEncoder&, uint64_t)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc:214:23: warning: comparison of integer expressions of different signedness: ‘int’ and ‘size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+  214 |     for (int i = 0; i < slot_count; i++) {
+      |                     ~~^~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc:230:23: warning: comparison of integer expressions of different signedness: ‘int’ and ‘size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+  230 |     for (int i = 0; i < slot_count; i++) {
+      |                     ~~^~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/test.cc:205:10: warning: unused variable ‘row_size’ [-Wunused-variable]
+  205 |   size_t row_size = slot_count / 2;
+      |          ^~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/server.cc: In member function ‘std::vector<seal::Ciphertext> Server::mul_database_with_compress(const std::vector<seal::Ciphertext>&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/PIRANA/src/server.cc:693:12: warning: unused variable ‘sel_vector_size’ [-Wunused-variable]
+  693 |   uint64_t sel_vector_size = _pir_parms.get_col_size();
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/coproto/coproto/Proto/Operation.h:17,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/coproto/coproto/Socket/SocketScheduler.h:19,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/coproto/coproto/Socket/Socket.h:19,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/coproto/coproto/coproto.h:11,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Coproto.h:9,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/NcoOtExt.h:13,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/macoro/macoro/stop.h: In function ‘macoro::stop_awaiter macoro::operator co_await(macoro::stop_token)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/macoro/macoro/stop.h:62:33: warning: redundant move in return statement [-Wredundant-move]
+   62 |                 return std::move(t);
+      |                        ~~~~~~~~~^~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/macoro/macoro/stop.h:62:33: note: remove ‘std::move’ call
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/coproto/coproto/Proto/Operation.h:17,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/coproto/coproto/Socket/SocketScheduler.h:19,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/coproto/coproto/Socket/Socket.h:19,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/coproto/coproto/coproto.h:11,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Coproto.h:9,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/NcoOtExt.h:13,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:2:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/macoro/macoro/stop.h: In function ‘macoro::stop_awaiter macoro::operator co_await(macoro::stop_token)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/macoro/macoro/stop.h:62:33: warning: redundant move in return statement [-Wredundant-move]
+   62 |                 return std::move(t);
+      |                        ~~~~~~~~~^~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/out/macoro/macoro/stop.h:62:33: note: remove ‘std::move’ call
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/main.cpp: In function ‘void simulate_pir(LPSIReceiver&, LPSISender&, const std::vector<std::vector<unsigned char> >&, const std::vector<unsigned int>&, size_t)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/main.cpp:416:12: warning: unused variable ‘num_rows’ [-Wunused-variable]
+  416 |     size_t num_rows = sender_num_main_buckets * sender_nh;  // 总行数 = 主桶数 × 子桶数
+      |            ^~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/main.cpp:417:12: warning: unused variable ‘row_size’ [-Wunused-variable]
+  417 |     size_t row_size = sender_sub_capacity;  // 每行大小 = 子桶容量
+      |            ^~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/main.cpp: In function ‘int run_main(size_t, size_t, size_t, std::string)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/main.cpp:602:12: warning: unused variable ‘pad_receiver_size’ [-Wunused-variable]
+  602 |     size_t pad_receiver_size = ratio * N;
+      |            ^~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h: In member function ‘void osuCrypto::OosNcoOtReceiver::operator=(osuCrypto::OosNcoOtReceiver&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:76:38: warning: implicitly-declared ‘osuCrypto::LinearCode& osuCrypto::LinearCode::operator=(const osuCrypto::LinearCode&)’ is deprecated [-Wdeprecated-copy]
+   76 |             mCode = std::move(v.mCode);
+      |                                      ^
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/LinearCode.h:25:9: note: because ‘osuCrypto::LinearCode’ has user-provided ‘osuCrypto::LinearCode::LinearCode(const osuCrypto::LinearCode&)’
+   25 |         LinearCode(const LinearCode& cp);
+      |         ^~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h: In constructor ‘osuCrypto::EKEPopf::EKEPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h:26:44: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   26 |         EKEPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                            ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h: In constructor ‘osuCrypto::EKEPopf::EKEPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h:27:39: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   27 |         EKEPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                       ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h: In member function ‘osuCrypto::Block256 osuCrypto::EKEPopf::getKey(osuCrypto::EKEPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h:50:34: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   50 |             RandomOracle roKey = ro;
+      |                                  ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:23,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h: In constructor ‘osuCrypto::FeistelMulPopf::FeistelMulPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h:30:51: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   30 |         FeistelMulPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                                   ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:23,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h: In constructor ‘osuCrypto::FeistelMulPopf::FeistelMulPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h:31:46: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   31 |         FeistelMulPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                              ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:23,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h: In member function ‘void osuCrypto::FeistelMulPopf::xorH(osuCrypto::FeistelMulPopf::PopfFunc&, osuCrypto::FeistelMulPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h:56:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   56 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h: In constructor ‘osuCrypto::FeistelPopf::FeistelPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:30:48: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   30 |         FeistelPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                                ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h: In constructor ‘osuCrypto::FeistelPopf::FeistelPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:31:43: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   31 |         FeistelPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                           ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h: In member function ‘osuCrypto::FeistelPopf::PopfOut osuCrypto::FeistelPopf::eval(osuCrypto::FeistelPopf::PopfFunc, osuCrypto::FeistelPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:35:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   35 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:38:22: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   38 |             xorHPrime(f, h);
+      |             ~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:72:50: note:   initializing argument 2 of ‘void osuCrypto::FeistelPopf::xorHPrime(osuCrypto::FeistelPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   72 |         void xorHPrime(PopfFunc &f, RandomOracle hPrime) const
+      |                                     ~~~~~~~~~~~~~^~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:39:17: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   39 |             xorH(f, h);
+      |             ~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:60:45: note:   initializing argument 2 of ‘void osuCrypto::FeistelPopf::xorH(osuCrypto::FeistelPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   60 |         void xorH(PopfFunc &f, RandomOracle h) const
+      |                                ~~~~~~~~~~~~~^
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h: In member function ‘osuCrypto::FeistelPopf::PopfFunc osuCrypto::FeistelPopf::program(osuCrypto::FeistelPopf::PopfIn, osuCrypto::FeistelPopf::PopfOut, osuCrypto::PRNG&) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:46:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   46 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:53:17: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   53 |             xorH(f, h);
+      |             ~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:60:45: note:   initializing argument 2 of ‘void osuCrypto::FeistelPopf::xorH(osuCrypto::FeistelPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   60 |         void xorH(PopfFunc &f, RandomOracle h) const
+      |                                ~~~~~~~~~~~~~^
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:54:22: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   54 |             xorHPrime(f, h);
+      |             ~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:72:50: note:   initializing argument 2 of ‘void osuCrypto::FeistelPopf::xorHPrime(osuCrypto::FeistelPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   72 |         void xorHPrime(PopfFunc &f, RandomOracle hPrime) const
+      |                                     ~~~~~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:25,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h: In constructor ‘osuCrypto::MRPopf::MRPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h:27:43: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   27 |         MRPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                           ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:25,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h: In constructor ‘osuCrypto::MRPopf::MRPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h:28:38: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   28 |         MRPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                      ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:25,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h: In member function ‘osuCrypto::MRPopf::PopfOut osuCrypto::MRPopf::eval(osuCrypto::MRPopf::PopfFunc, osuCrypto::MRPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h:33:35: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   33 |             RandomOracle roMask = ro;
+      |                                   ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:25,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h: In member function ‘osuCrypto::MRPopf::PopfFunc osuCrypto::MRPopf::program(osuCrypto::MRPopf::PopfIn, osuCrypto::MRPopf::PopfOut, osuCrypto::PRNG&) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h:48:35: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   48 |             RandomOracle roMask = ro;
+      |                                   ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:27,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/SodiumCurve.h: In member function ‘void osuCrypto::Sodium::Rist25519::fromHash(const unsigned char*, size_t)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/SodiumCurve.h:328:25: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+  328 |         *this = fromHash(ro);
+      |                 ~~~~~~~~^~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:27,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/SodiumCurve.h:316:44: note:   initializing argument 1 of ‘static osuCrypto::Sodium::Rist25519 osuCrypto::Sodium::Rist25519::fromHash(osuCrypto::RandomOracle)’
+  316 |     static Rist25519 fromHash(RandomOracle ro)
+      |                               ~~~~~~~~~~~~~^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h: In constructor ‘osuCrypto::FeistelRistPopf::FeistelRistPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:37:52: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   37 |         FeistelRistPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                                    ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h: In constructor ‘osuCrypto::FeistelRistPopf::FeistelRistPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:38:47: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   38 |         FeistelRistPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                               ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h: In member function ‘osuCrypto::FeistelRistPopf::PopfOut osuCrypto::FeistelRistPopf::eval(osuCrypto::FeistelRistPopf::PopfFunc, osuCrypto::FeistelRistPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:42:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   42 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:44:22: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   44 |             xorHPrime(f, h);
+      |             ~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:83:50: note:   initializing argument 2 of ‘void osuCrypto::FeistelRistPopf::xorHPrime(osuCrypto::FeistelRistPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   83 |         void xorHPrime(PopfFunc &f, RandomOracle hPrime) const
+      |                                     ~~~~~~~~~~~~~^~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:48:17: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   48 |             addH(t, f.s, h, false);
+      |             ~~~~^~~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:69:59: note:   initializing argument 3 of ‘void osuCrypto::FeistelRistPopf::addH(osuCrypto::FeistelRistPopf::Point&, const osuCrypto::block*, osuCrypto::RandomOracle, bool) const’
+   69 |         void addH(Point& t, const block s[], RandomOracle h, bool negate) const
+      |                                              ~~~~~~~~~~~~~^
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h: In member function ‘osuCrypto::FeistelRistPopf::PopfFunc osuCrypto::FeistelRistPopf::program(osuCrypto::FeistelRistPopf::PopfIn, osuCrypto::FeistelRistPopf::PopfOut, osuCrypto::PRNG&) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:55:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   55 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:61:17: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   61 |             addH(y, f.s, h, true);
+      |             ~~~~^~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:69:59: note:   initializing argument 3 of ‘void osuCrypto::FeistelRistPopf::addH(osuCrypto::FeistelRistPopf::Point&, const osuCrypto::block*, osuCrypto::RandomOracle, bool) const’
+   69 |         void addH(Point& t, const block s[], RandomOracle h, bool negate) const
+      |                                              ~~~~~~~~~~~~~^
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:63:22: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   63 |             xorHPrime(f, h);
+      |             ~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:83:50: note:   initializing argument 2 of ‘void osuCrypto::FeistelRistPopf::xorHPrime(osuCrypto::FeistelRistPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   83 |         void xorHPrime(PopfFunc &f, RandomOracle hPrime) const
+      |                                     ~~~~~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h: In constructor ‘osuCrypto::FeistelMulRistPopf::FeistelMulRistPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h:34:55: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   34 |         FeistelMulRistPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                                       ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h: In constructor ‘osuCrypto::FeistelMulRistPopf::FeistelMulRistPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h:35:50: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   35 |         FeistelMulRistPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                                  ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h: In member function ‘void osuCrypto::FeistelMulRistPopf::addH(osuCrypto::FeistelMulRistPopf::Point&, const unsigned char*, osuCrypto::FeistelMulRistPopf::PopfIn, bool) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h:63:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   63 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h:66:38: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   66 |             Point v = Point::fromHash(h);
+      |                       ~~~~~~~~~~~~~~~^~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:27,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/SodiumCurve.h:316:44: note:   initializing argument 1 of ‘static osuCrypto::Sodium::Rist25519 osuCrypto::Sodium::Rist25519::fromHash(osuCrypto::RandomOracle)’
+  316 |     static Rist25519 fromHash(RandomOracle ro)
+      |                               ~~~~~~~~~~~~~^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:5,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h: In member function ‘void osuCrypto::OosNcoOtSender::operator=(osuCrypto::OosNcoOtSender&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:63:38: warning: implicitly-declared ‘osuCrypto::LinearCode& osuCrypto::LinearCode::operator=(const osuCrypto::LinearCode&)’ is deprecated [-Wdeprecated-copy]
+   63 |             mCode = std::move(v.mCode);
+      |                                      ^
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/../../../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:1:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/LinearCode.h:25:9: note: because ‘osuCrypto::LinearCode’ has user-provided ‘osuCrypto::LinearCode::LinearCode(const osuCrypto::LinearCode&)’
+   25 |         LinearCode(const LinearCode& cp);
+      |         ^~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:2:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h: In member function ‘void osuCrypto::OosNcoOtReceiver::operator=(osuCrypto::OosNcoOtReceiver&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:76:38: warning: implicitly-declared ‘osuCrypto::LinearCode& osuCrypto::LinearCode::operator=(const osuCrypto::LinearCode&)’ is deprecated [-Wdeprecated-copy]
+   76 |             mCode = std::move(v.mCode);
+      |                                      ^
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:2:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/LinearCode.h:25:9: note: because ‘osuCrypto::LinearCode’ has user-provided ‘osuCrypto::LinearCode::LinearCode(const osuCrypto::LinearCode&)’
+   25 |         LinearCode(const LinearCode& cp);
+      |         ^~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp: In function ‘macoro::task<> receiverTask(osuCrypto::OosNcoOtReceiver&, const KOutOfNConfig&, osuCrypto::PRNG&, coproto::LocalAsyncSocket, const std::vector<unsigned int>&, std::vector<unsigned int>&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:41:13: warning: unused variable ‘maxN’ [-Wunused-variable]
+   41 |         u64 maxN = 1ULL << config.inputBitCount;
+      |             ^~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp: In function ‘macoro::task<> senderTask(osuCrypto::OosNcoOtSender&, const KOutOfNConfig&, osuCrypto::PRNG&, coproto::LocalAsyncSocket, const std::vector<unsigned int>&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/thirdparty/oos_OT/oos_OT.cpp:102:13: warning: unused variable ‘maxN’ [-Wunused-variable]
+  102 |         u64 maxN = 1ULL << config.inputBitCount;
+      |             ^~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h: In constructor ‘osuCrypto::EKEPopf::EKEPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h:26:44: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   26 |         EKEPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                            ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h: In constructor ‘osuCrypto::EKEPopf::EKEPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h:27:39: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   27 |         EKEPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                       ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h: In member function ‘osuCrypto::Block256 osuCrypto::EKEPopf::getKey(osuCrypto::EKEPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/EKEPopf.h:50:34: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   50 |             RandomOracle roKey = ro;
+      |                                  ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:23,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h: In constructor ‘osuCrypto::FeistelMulPopf::FeistelMulPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h:30:51: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   30 |         FeistelMulPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                                   ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:23,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h: In constructor ‘osuCrypto::FeistelMulPopf::FeistelMulPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h:31:46: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   31 |         FeistelMulPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                              ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:23,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h: In member function ‘void osuCrypto::FeistelMulPopf::xorH(osuCrypto::FeistelMulPopf::PopfFunc&, osuCrypto::FeistelMulPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulPopf.h:56:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   56 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h: In constructor ‘osuCrypto::FeistelPopf::FeistelPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:30:48: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   30 |         FeistelPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                                ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h: In constructor ‘osuCrypto::FeistelPopf::FeistelPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:31:43: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   31 |         FeistelPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                           ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h: In member function ‘osuCrypto::FeistelPopf::PopfOut osuCrypto::FeistelPopf::eval(osuCrypto::FeistelPopf::PopfFunc, osuCrypto::FeistelPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:35:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   35 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:38:22: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   38 |             xorHPrime(f, h);
+      |             ~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:72:50: note:   initializing argument 2 of ‘void osuCrypto::FeistelPopf::xorHPrime(osuCrypto::FeistelPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   72 |         void xorHPrime(PopfFunc &f, RandomOracle hPrime) const
+      |                                     ~~~~~~~~~~~~~^~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:39:17: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   39 |             xorH(f, h);
+      |             ~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:60:45: note:   initializing argument 2 of ‘void osuCrypto::FeistelPopf::xorH(osuCrypto::FeistelPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   60 |         void xorH(PopfFunc &f, RandomOracle h) const
+      |                                ~~~~~~~~~~~~~^
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h: In member function ‘osuCrypto::FeistelPopf::PopfFunc osuCrypto::FeistelPopf::program(osuCrypto::FeistelPopf::PopfIn, osuCrypto::FeistelPopf::PopfOut, osuCrypto::PRNG&) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:46:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   46 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:53:17: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   53 |             xorH(f, h);
+      |             ~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:60:45: note:   initializing argument 2 of ‘void osuCrypto::FeistelPopf::xorH(osuCrypto::FeistelPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   60 |         void xorH(PopfFunc &f, RandomOracle h) const
+      |                                ~~~~~~~~~~~~~^
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:54:22: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   54 |             xorHPrime(f, h);
+      |             ~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:24,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelPopf.h:72:50: note:   initializing argument 2 of ‘void osuCrypto::FeistelPopf::xorHPrime(osuCrypto::FeistelPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   72 |         void xorHPrime(PopfFunc &f, RandomOracle hPrime) const
+      |                                     ~~~~~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:25,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h: In constructor ‘osuCrypto::MRPopf::MRPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h:27:43: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   27 |         MRPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                           ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:25,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h: In constructor ‘osuCrypto::MRPopf::MRPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h:28:38: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   28 |         MRPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                      ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:25,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h: In member function ‘osuCrypto::MRPopf::PopfOut osuCrypto::MRPopf::eval(osuCrypto::MRPopf::PopfFunc, osuCrypto::MRPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h:33:35: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   33 |             RandomOracle roMask = ro;
+      |                                   ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:25,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h: In member function ‘osuCrypto::MRPopf::PopfFunc osuCrypto::MRPopf::program(osuCrypto::MRPopf::PopfIn, osuCrypto::MRPopf::PopfOut, osuCrypto::PRNG&) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/MRPopf.h:48:35: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   48 |             RandomOracle roMask = ro;
+      |                                   ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:27,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/SodiumCurve.h: In member function ‘void osuCrypto::Sodium::Rist25519::fromHash(const unsigned char*, size_t)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/SodiumCurve.h:328:25: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+  328 |         *this = fromHash(ro);
+      |                 ~~~~~~~~^~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:27,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/SodiumCurve.h:316:44: note:   initializing argument 1 of ‘static osuCrypto::Sodium::Rist25519 osuCrypto::Sodium::Rist25519::fromHash(osuCrypto::RandomOracle)’
+  316 |     static Rist25519 fromHash(RandomOracle ro)
+      |                               ~~~~~~~~~~~~~^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h: In constructor ‘osuCrypto::FeistelRistPopf::FeistelRistPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:37:52: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   37 |         FeistelRistPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                                    ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h: In constructor ‘osuCrypto::FeistelRistPopf::FeistelRistPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:38:47: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   38 |         FeistelRistPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                               ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h: In member function ‘osuCrypto::FeistelRistPopf::PopfOut osuCrypto::FeistelRistPopf::eval(osuCrypto::FeistelRistPopf::PopfFunc, osuCrypto::FeistelRistPopf::PopfIn) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:42:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   42 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:44:22: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   44 |             xorHPrime(f, h);
+      |             ~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:83:50: note:   initializing argument 2 of ‘void osuCrypto::FeistelRistPopf::xorHPrime(osuCrypto::FeistelRistPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   83 |         void xorHPrime(PopfFunc &f, RandomOracle hPrime) const
+      |                                     ~~~~~~~~~~~~~^~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:48:17: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   48 |             addH(t, f.s, h, false);
+      |             ~~~~^~~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:69:59: note:   initializing argument 3 of ‘void osuCrypto::FeistelRistPopf::addH(osuCrypto::FeistelRistPopf::Point&, const osuCrypto::block*, osuCrypto::RandomOracle, bool) const’
+   69 |         void addH(Point& t, const block s[], RandomOracle h, bool negate) const
+      |                                              ~~~~~~~~~~~~~^
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h: In member function ‘osuCrypto::FeistelRistPopf::PopfFunc osuCrypto::FeistelRistPopf::program(osuCrypto::FeistelRistPopf::PopfIn, osuCrypto::FeistelRistPopf::PopfOut, osuCrypto::PRNG&) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:55:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   55 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:61:17: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   61 |             addH(y, f.s, h, true);
+      |             ~~~~^~~~~~~~~~~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:69:59: note:   initializing argument 3 of ‘void osuCrypto::FeistelRistPopf::addH(osuCrypto::FeistelRistPopf::Point&, const osuCrypto::block*, osuCrypto::RandomOracle, bool) const’
+   69 |         void addH(Point& t, const block s[], RandomOracle h, bool negate) const
+      |                                              ~~~~~~~~~~~~~^
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:63:22: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   63 |             xorHPrime(f, h);
+      |             ~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:21,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelRistPopf.h:83:50: note:   initializing argument 2 of ‘void osuCrypto::FeistelRistPopf::xorHPrime(osuCrypto::FeistelRistPopf::PopfFunc&, osuCrypto::RandomOracle) const’
+   83 |         void xorHPrime(PopfFunc &f, RandomOracle hPrime) const
+      |                                     ~~~~~~~~~~~~~^~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h: In constructor ‘osuCrypto::FeistelMulRistPopf::FeistelMulRistPopf(const RandomOracle&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h:34:55: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   34 |         FeistelMulRistPopf(const RandomOracle& ro_) : ro(ro_) {}
+      |                                                       ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h: In constructor ‘osuCrypto::FeistelMulRistPopf::FeistelMulRistPopf(osuCrypto::RandomOracle&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h:35:50: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   35 |         FeistelMulRistPopf(RandomOracle&& ro_) : ro(ro_) {}
+      |                                                  ^~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h: In member function ‘void osuCrypto::FeistelMulRistPopf::addH(osuCrypto::FeistelMulRistPopf::Point&, const unsigned char*, osuCrypto::FeistelMulRistPopf::PopfIn, bool) const’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h:63:30: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   63 |             RandomOracle h = ro;
+      |                              ^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoy.h:22,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:14,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/Popf/FeistelMulRistPopf.h:66:38: warning: implicitly-declared ‘constexpr osuCrypto::Blake2::Blake2(const osuCrypto::Blake2&)’ is deprecated [-Wdeprecated-copy]
+   66 |             Point v = Point::fromHash(h);
+      |                       ~~~~~~~~~~~~~~~^~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/RandomOracle.h:3,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:20,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/Blake2.h:97:31: note: because ‘osuCrypto::Blake2’ has user-provided ‘const osuCrypto::Blake2& osuCrypto::Blake2::operator=(const osuCrypto::Blake2&)’
+   97 |                 const Blake2& operator=(const Blake2& src);
+      |                               ^~~~~~~~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/McRosRoyTwist.h:27,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Base/BaseOT.h:12,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/cryptoTools/cryptoTools/Crypto/SodiumCurve.h:316:44: note:   initializing argument 1 of ‘static osuCrypto::Sodium::Rist25519 osuCrypto::Sodium::Rist25519::fromHash(osuCrypto::RandomOracle)’
+  316 |     static Rist25519 fromHash(RandomOracle ro)
+      |                               ~~~~~~~~~~~~~^~
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:3:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h: In member function ‘void osuCrypto::OosNcoOtSender::operator=(osuCrypto::OosNcoOtSender&&)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtSender.h:63:38: warning: implicitly-declared ‘osuCrypto::LinearCode& osuCrypto::LinearCode::operator=(const osuCrypto::LinearCode&)’ is deprecated [-Wdeprecated-copy]
+   63 |             mCode = std::move(v.mCode);
+      |                                      ^
+In file included from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/NChooseOne/Oos/OosNcoOtReceiver.h:15,
+                 from /home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:2:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/../libOTe/libOTe/Tools/LinearCode.h:25:9: note: because ‘osuCrypto::LinearCode’ has user-provided ‘osuCrypto::LinearCode::LinearCode(const osuCrypto::LinearCode&)’
+   25 |         LinearCode(const LinearCode& cp);
+      |         ^~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp: In function ‘bool run_oos_ot(const std::vector<std::vector<std::vector<unsigned char> > >&, const std::vector<long unsigned int>&, std::vector<std::vector<unsigned char> >&, size_t&, uint32_t, bool)’:
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:396:16: warning: unused variable ‘base_time’ [-Wunused-variable]
+  396 |         double base_time = std::chrono::duration<double, std::milli>(base_end - base_start).count();
+      |                ^~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:399:16: warning: unused variable ‘bytes_after_base’ [-Wunused-variable]
+  399 |         size_t bytes_after_base = socks[0].bytesReceived() + socks[1].bytesReceived();
+      |                ^~~~~~~~~~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:414:16: warning: unused variable ‘ext_time’ [-Wunused-variable]
+  414 |         double ext_time = std::chrono::duration<double, std::milli>(ext_end - ext_start).count();
+      |                ^~~~~~~~
+/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI/protocol_v2/src/oos_ot.cpp:415:16: warning: unused variable ‘total_time’ [-Wunused-variable]
+  415 |         double total_time = std::chrono::duration<double, std::milli>(total_end - start_time).count();
+      |                ^~~~~~~~~~
+[100%] Linking CXX executable bin/lpsi_test
+[100%] Built target lpsi_test
+[0;32m编译成功![0m
+
+========================================
+   Payable LPSI协议 (动态参数分段计时)
+========================================
+Mode: direct
+
+[1] 正在执行: 导入数据和初始化...
+[数据导入] Sender数据项数: 4096
+[数据导入] Receiver数据项数: 2048
+[数据导入] Payload size: 1 字节
+
+[2] 正在执行: DH-OPRF...
+Receiver: 计算OPRF Step 1 (ECC + OpenMP)...
+Receiver: 处理OPRF Step 3 (ECC + OpenMP)...
+Sender: 计算 X' (ECC + OpenMP)...
+Compute X prf time: 18.205 ms 
+[OPRF] 通信开销: 135168 Bytes
+
+[3] 正在执行: 构造双层Hash...
+外层主桶膨胀系数: 1.5
+内层子桶总膨胀系数: 1.8
+Sender: 构建主哈希桶 (3-way Simple Hash)...
+[子桶容量] 使用 SUB_BUCKET_FACTOR = 0.6
+[子桶容量] 子桶容量计算: max_bucket_size=11, nh=3 -> 每个子桶capacity=7, 总容量=21
+Sender: 构建子哈希桶 (每个主桶独立Cuckoo Hash)...
+Sender: 子桶构建完成, 总子桶数 = 9216
+Receiver: 构建主哈希桶 (Cuckoo Hash)...
+✓ 所有元素成功映射到唯一主桶
+Receiver: 主哈希桶数量 = 3072
+Receiver: 构建子哈希桶 (3way Simple Hash)...
+
+[4] 正在执行: Batch PIR (Prepare + Execute)...
+Sender: PIR数据库准备完成
+  总行数: 9216 (每个子桶1行)
+  每行大小: 7 slots
+  非空slots: 12285 / 64512
+  PIR输入数据库相比原始数据集X膨胀率: x15.75
+Sender桶结构: 3072 个主桶, 3 个子桶, 每个容量 7
+Receiver: PIR查询索引生成完成, 总主桶数 = 3072, 总查询数 = 9216
+  PIR输入查询集合相比原始查询数据Y膨胀率: x4.5
+[双边映射正确性验证] ✓ 所有测试元素都正确映射，验证通过!
+
+---------------Call Batch PIR-----------------------
+构造 Direct Mode PirParms (用于预处理参数计算)...
+Direct Mode: Building deterministic buckets...
+
+[数据预处理] payload_size=128 bytes
+[数据预处理] plain_modulus_bit=17
+[数据预处理] 每个payload需要 64 slots
+[数据预处理] 每个slot可存储 16 bits
+[数据预处理] 完成，转换了 64512 个payloads
+Start Direct Batch PIR (Skip Cuckoo)! 
+Direct Mode: Building deterministic buckets...
+/
+|   Encryption parameters: 
+|   scheme: BFV
+|   poly_modulus_degree: 8192
+|   plain_modulus: 114689
+|   coeff_modulus size:  (56 + 56 + 24 + 24) 160 bits
+\
+--------------------------------------
+/
+|   PIR parameters: 
+|   Number of payloads (n): 64512
+|   Payload size (|pl|): 128 Bytes
+|   Number of payload slot: 64
+|   Number of query (L): 9216
+|   Is compress: 0
+|   Num slot: 1
+|   Col Size: 7
+|   Table Size : 16384
+|   Hamming weight (k): 2
+|   Encoding size (m): 5
+|   Bundle size: 2
+\
+Using direct_encode_to_ntt_db() for Direct Mode
+Direct Encoding database (No Cuckoo)!
+Direct Encoding END!
+Client: Generating Direct Batch Query (Independent Bundles)...
+Client: Generated 10 query ciphertexts.
+Server: Generating Direct Batch Response (Direct Mode)...
+Inner Direct Batch PIR correctness check...
+Direct PIR correctness check passed!
+------------------------------------
+Performance (Direct Mode): 
+Init time: 1028.65 ms 
+Gen query time: 21.75 ms 
+Gen response time: 439.7 ms 
+Extract answer time: 73.306 ms 
+Result convert time: 9.961 ms 
+Direct Batch PIR online time: 544.717 ms 
+Query size: 1477.63 KBytes
+Response size: 15495.3 KBytes
+[Batch PIR] 通信开销: 17380333 Bytes
+[PIR外部验证] 模拟与实际结果匹配: NO
+Receiver: 收到 9216 个PIR结果
+
+========== 筛选PIR命中元素 ==========
+总计: 命中 2048/2048 个元素
+
+[5] 正在执行: OT...
+
+---------------Call OOS OT-----------------------
+Receiver: 生成 2048 个OT选择索引
+[OT] 通信开销: 335681448 Bytes
+
+[6] 正在执行: 解密验证...
+
+========== 解密交集 ==========
+处理 2048 个命中元素...
+
+========== 解密完成 ==========
+Receiver: 解密得到交集大小 = 2048
+
+========================================
+         协议执行输出:
+========================================
+【Sender视角】交集大小: 2048
+【Receiver视角】交集大小: 2048
+[交集数据验证] 2048/2048 个正确
+
+[Final 正确性验证]✓ 协议执行正确
+
+========================================
+        协议执行在线耗时统计 (ms)
+========================================
+1. 导入数据 (Init):               2.00 ms
+----------------------------------------
+2. DH-OPRF:                          27.11 ms
+3. 构造查询索引:              365.39 ms
+4. Batch PIR:                       544.72 ms
+5. OT:                            13468.00 ms
+6. 解密结果:                     10.00 ms
+========================================
+总协议执行时间:               14415 ms
+(Total = 2+3+4+5+6, 不含初始化)
+========================================
+
+========================================
+        协议执行总通信开销统计
+========================================
+总通信开销: 353196949 Bytes (344918.90 KB)
+(DH-OPRF 135168 Bytes, Batch PIR 17380333 Bytes, OT 335681448 Bytes)
+========================================
+
+============format online result(s)============================
+Sender_size 4096 Receiver_size 2048 Payload_size_bytes 1
+14.415
+(OPRF 0.027 Gen_idx 0.365 Query_idx 0.545 Get_key 13.468 Dec 0.010)

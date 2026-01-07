@@ -1,0 +1,126 @@
+./bin/lpsi_test -x 4096 -y 2048 -p 1 -m 1
+
+========================================
+   Payable LPSI协议 (动态参数分段计时)
+========================================
+Mode: default
+
+[1] 正在执行: 导入数据和初始化...
+[数据导入] Sender数据项数: 4096
+[数据导入] Receiver数据项数: 2048
+[数据导入] Payload size: 1 字节
+
+[2] 正在执行: DH-OPRF...
+Receiver: 计算OPRF Step 1 (ECC + OpenMP)...
+Receiver: 处理OPRF Step 3 (ECC + OpenMP)...
+Sender: 计算 X' (ECC + OpenMP)...
+Compute X prf time: 20.483 ms 
+[OPRF] 通信开销: 135168 Bytes
+
+[3] 正在执行: 构造双层Hash...
+外层主桶膨胀系数: 1.5
+内层子桶总膨胀系数: 1.8
+Sender: 构建主哈希桶 (3-way Simple Hash)...
+[子桶容量] 使用 SUB_BUCKET_FACTOR = 0.6
+[子桶容量] 子桶容量计算: max_bucket_size=12, nh=3 -> 每个子桶capacity=8, 总容量=24
+Sender: 构建子哈希桶 (每个主桶独立Cuckoo Hash)...
+Sender: 子桶构建完成, 总子桶数 = 9216
+Receiver: 构建主哈希桶 (Cuckoo Hash)...
+✓ 所有元素成功映射到唯一主桶
+Receiver: 主哈希桶数量 = 3072
+Receiver: 构建子哈希桶 (3way Simple Hash)...
+
+[4] 正在执行: Batch PIR (Prepare + Execute)...
+Sender: PIR数据库准备完成
+  总行数: 9216 (每个子桶1行)
+  每行大小: 8 slots
+  非空slots: 12286 / 73728
+  PIR输入数据库相比原始数据集X膨胀率: x18
+Sender桶结构: 3072 个主桶, 3 个子桶, 每个容量 8
+Receiver: PIR查询索引生成完成, 总主桶数 = 3072, 总查询数 = 9216
+  PIR输入查询集合相比原始查询数据Y膨胀率: x4.5
+[双边映射正确性验证] ✓ 所有测试元素都正确映射，验证通过!
+
+---------------Call Batch PIR-----------------------
+构造 Default Mode PirParms (用于预处理参数计算)...
+Preprocessing cuckoo hash!
+Cuckoo hash done!
+/
+|   Encryption parameters: 
+|   scheme: BFV
+|   poly_modulus_degree: 4096
+|   plain_modulus: 114689
+|   coeff_modulus size:  (48 + 32 + 24) 104 bits
+\
+--------------------------------------
+/
+|   PIR parameters: 
+|   Number of payloads (n): 73728
+|   Payload size (|pl|): 128 Bytes
+|   Number of payload slot: 64
+|   Number of query (L): 9216
+|   Is compress: 0
+|   Num slot: 1
+|   Col Size: 31
+|   Table Size : 16384
+|   Hamming weight (k): 2
+|   Encoding size (m): 9
+|   Bundle size: 4
+\
+
+[数据预处理] payload_size=128 bytes
+[数据预处理] plain_modulus_bit=17
+[数据预处理] 每个payload需要 64 slots
+[数据预处理] 每个slot可存储 16 bits
+[数据预处理] 完成，转换了 73728 个payloads
+Start my batch PIR! 
+Preprocessing cuckoo hash!
+Cuckoo hash done!
+/
+|   Encryption parameters: 
+|   scheme: BFV
+|   poly_modulus_degree: 4096
+|   plain_modulus: 114689
+|   coeff_modulus size:  (48 + 32 + 24) 104 bits
+\
+--------------------------------------
+/
+|   PIR parameters: 
+|   Number of payloads (n): 73728
+|   Payload size (|pl|): 128 Bytes
+|   Number of payload slot: 64
+|   Number of query (L): 9216
+|   Is compress: 0
+|   Num slot: 1
+|   Col Size: 31
+|   Table Size : 16384
+|   Hamming weight (k): 2
+|   Encoding size (m): 9
+|   Bundle size: 4
+\
+[PIR参数预处理]数据验证通过! payload size最大值 65535 <  plain_modulus 114689
+Encode database now!
+
+[PIR内部验证] check pir correctness passed!
+------------------------------------
+Performance(Default Mode): 
+Init time: 2018.47 ms 
+Gen query time: 37.349 ms 
+Gen response time: 1055.34 ms 
+Extract answer time: 82.097 ms 
+Result convert time: 11.51 ms 
+Batch PIR online time: 1186.3 ms 
+Query size: 1653.01 KBytes
+Response size: 8339.65 KBytes
+[Batch PIR] 通信开销: 10232482 Bytes
+[PIR外部验证] 模拟与实际结果匹配: NO
+Receiver: 收到 9216 个PIR结果
+
+========== 筛选PIR命中元素 ==========
+主桶[2793] 元素[625]: 未命中 (所有3个查询都未找到)
+总计: 命中 2047/2048 个元素
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  命中元素数与预期大小不匹配
+./make&run.sh: line 37: 650745 Aborted                 (core dumped) ./bin/lpsi_test -x 4096 -y 2048 -p 1 -m 1
+
+./bin/lpsi_test -x 4096 -y 2048 -p 1 -m 0

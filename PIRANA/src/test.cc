@@ -185,7 +185,7 @@ void test_direct_batch_pir_correctness(Server &server,
                 uint64_t actual = answer.at(ct_index).at(slot + loc * num_slot);
                 
                 if (expected != actual) {
-                    std::cerr << "!!! [Direct PIR Compressed] 验证失败 !!!" << std::endl;
+                    std::cerr << "!!! [Direct PIR] 验证失败 !!!" << std::endl;
                     std::cerr << "Query #" << i << " (Global Index: " << global_idx << ")" << std::endl;
                     std::cerr << "Item Slot: " << j << std::endl;
                     std::cerr << "Loc (Query ID): " << loc << std::endl;

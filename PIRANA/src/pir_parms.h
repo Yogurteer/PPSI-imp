@@ -31,6 +31,7 @@ class PirParms {
   uint32_t _num_slot;
   bool _is_compress;
   bool _enable_rotate = false;
+  
   // uint64_t
   std::vector<std::vector<uint32_t>> _bucket;
   std::map<std::string, uint32_t> _hash_index;
@@ -81,6 +82,8 @@ class PirParms {
   void print_seal_parms();
   void print_pir_parms();
   // void pre_cw_index();
+
+  bool _is_direct_mode = false;
 };
 
 #endif

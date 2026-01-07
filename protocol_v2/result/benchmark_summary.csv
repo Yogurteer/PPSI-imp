@@ -1,1 +1,3 @@
 Sender,Receiver,Payload,Total_s,OPRF_s,Gen_Idx_s,Query_Idx_s,Get_Key_s,Dec_s
+256,1,1,0.122,0.015,0.000,0.107,0.000,0.000
+256,64,1,FAIL,FAIL,FAIL,FAIL,FAIL,FAIL
