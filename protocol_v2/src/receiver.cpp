@@ -477,6 +477,8 @@ void LPSIReceiver::generate_pir_query_indices(size_t sender_num_main_buckets,
     
     std::cout << "Receiver: PIR查询索引生成完成, 总主桶数 = " << query_indices.size() 
               << ", 总查询数 = " << (query_indices.size() * sender_nh) << std::endl;
+    double y_inflation = static_cast<double>(query_indices.size() * sender_nh) / static_cast<double>(input_data.size());
+    std::cout << "  PIR输入查询集合相比原始查询数据Y膨胀率: x" << y_inflation << std::endl;
 }
 
 std::vector<uint32_t> LPSIReceiver::get_query_indices_flat() const {

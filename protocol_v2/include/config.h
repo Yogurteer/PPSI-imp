@@ -24,14 +24,13 @@ namespace LPSIConfig {
     
     // 主桶数量倍数 (相对于receiver数据量)
     // 推荐值: 2.5 - 3.0 (更大的值提高Cuckoo哈希成功率，但增加通信开销)
-    constexpr double MAIN_BUCKET_FACTOR = 2.5;
-    constexpr double SUB_BUCKET_FACTOR = 1.9; // 每个sub桶容量倍数 (相对于主桶最大元素数)
+    constexpr double MAIN_BUCKET_FACTOR = 1.5;
+    constexpr double SUB_BUCKET_FACTOR = 0.6; // 每个sub桶容量倍数 (相对于主桶最大元素数)
     // 最大重试次数，防止无限循环
     constexpr size_t MAX_RETRY = 750;
 
-    // 外层哈希函数数量 (Cuckoo哈希的候选位置数)
+    // 哈希函数数量 (Cuckoo哈希的候选位置数)
     constexpr int OUTER_NUM_HASH_FUNCTIONS = 3;
-    constexpr int INNER_NUM_HASH_FUNCTIONS = 3;
     
     // 子桶数量 (每个主桶内的子桶数，用于第二层哈希)
     // 注意：内层Cuckoo哈希的hash函数数量应该等于子桶数量
@@ -65,7 +64,7 @@ namespace LPSIConfig {
     // PIR数据库项大小 (字节)
     // x_prime + masked_value
     
-    inline size_t PIR_ITEM_SIZE = 64;
+    inline size_t PIR_PAYLOAD_SIZE = 64;
     
     // ===== 密码学参数 =====
     

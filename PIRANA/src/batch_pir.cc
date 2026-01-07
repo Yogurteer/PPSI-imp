@@ -208,7 +208,7 @@ std::vector<Element> my_batch_pir_main(const uint64_t num_payloads, const uint64
   auto result_convert_time = timer.elapsed();
 
   std::cout << "------------------------------------" << std::endl;
-  std::cout << "Performance(Default Mode):: " << std::endl;
+  std::cout << "Performance(Default Mode): " << std::endl;
   std::cout << "Init time: " << init_time << " ms " << std::endl;
   std::cout << "Gen query time: " << query_time << " ms " << std::endl;
   std::cout << "Gen response time: " << response_time << " ms " << std::endl;
@@ -266,6 +266,8 @@ std::vector<Element> my_direct_batch_pir_main(
 
   // 使用 Direct Mode 构造函数初始化参数
   PirParms pir_parms(expected_db_size, payload_size, num_rows, col_size);
+  pir_parms.print_seal_parms();
+  pir_parms.print_pir_parms();
   
   // 2. 初始化 Client 和 Server
   Client batch_client(pir_parms);
@@ -294,7 +296,6 @@ std::vector<Element> my_direct_batch_pir_main(
   // 4. 生成响应
   timer.reset();
   std::stringstream response = batch_server.gen_direct_batch_response_no_cuckoo(query);
-  // std::stringstream response = batch_server.gen_batch_response(query);
   auto response_time = timer.elapsed();
 
   // 5. 提取结果 (得到 slots 形式)

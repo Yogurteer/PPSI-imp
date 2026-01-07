@@ -88,13 +88,11 @@ std::vector<Element> run_batch_pir(
     bool is_batch = true;
     bool is_compress = false; 
     
-    // 【关键修改 1】使用 Direct Mode 的构造函数初始化临时参数
     // 目的是获取正确的 plain_modulus_bit 和 num_payload_slot
     // num_query 对应 PIR 矩阵的行数 (子桶数)
     // row_size 对应 PIR 矩阵的列数 (子桶容量)
     std::unique_ptr<PirParms> temp_pir_parms;
     if (batch_PIR_mode == "direct") {
-        is_compress = true; // Direct Mode 默认开启压缩
         std::cout << "构造 Direct Mode PirParms (用于预处理参数计算)..." << std::endl;
         temp_pir_parms = std::make_unique<PirParms>(num_payloads, payload_size, num_query, row_size);
     }
@@ -305,6 +303,10 @@ void phase2_build_hash_buckets(
     
     MyTimer timer;
     
+    // 打印外层主桶膨胀系数和内层子桶总膨胀系数
+    cout << "外层主桶膨胀系数: " << LPSIConfig::MAIN_BUCKET_FACTOR << std::endl;
+    cout << "内层子桶总膨胀系数: " << LPSIConfig::NUM_SUB_BUCKETS * LPSIConfig::SUB_BUCKET_FACTOR << std::endl;
+
     // 计算主桶数量
     size_t num_main_buckets = static_cast<size_t>(LPSIConfig::MAIN_BUCKET_FACTOR * receiver_data_size);
     
@@ -727,10 +729,8 @@ int main(int argc, char** argv) {
                 break;
             case 'p':
                 payload_size = std::stoul(optarg);
-                // 注意: 还需要确保 LPSIConfig 中的 PIR_ITEM_SIZE 也被更新
-                // 如果 config 是静态常量，这里可能需要额外处理
-                // 建议在 config.h 中将 PIR_ITEM_SIZE 改为 static 变量或添加设置函数
-                LPSIConfig::PIR_ITEM_SIZE = 128; // 实际可根据需要调整
+
+                LPSIConfig::PIR_PAYLOAD_SIZE = 128; // label byte length
                 break;
             case 'm':
                 // 1-default mode, 0-direct mode
