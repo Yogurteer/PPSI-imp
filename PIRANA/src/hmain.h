@@ -17,7 +17,8 @@ using Element = std::vector<unsigned char>;
 
 std::vector<Element> my_batch_pir_main(const uint64_t num_payloads, const uint64_t payload_size,
                     const uint64_t num_query, const bool is_batch,
-                    const bool is_compress, std::vector<std::vector<uint64_t>> input_db, std::vector<uint32_t> query_indices, double& online_time);
+                    const bool is_compress, std::vector<std::vector<uint64_t>> input_db, 
+                    std::vector<uint32_t> query_indices, double& online_time, size_t& com_bytes);
 
 std::vector<Element> my_direct_batch_pir_main(
     const uint64_t num_payloads, 
@@ -28,7 +29,7 @@ std::vector<Element> my_direct_batch_pir_main(
     std::vector<std::vector<uint64_t>> input_db, 
     std::vector<uint32_t> query_indices,
     size_t col_size, 
-    double& online_time);
+    double& online_time, size_t& com_bytes);
     
 void batch_pir_main(const uint64_t num_payloads, const uint64_t payload_size,
                     const uint64_t num_query, const bool is_batch,

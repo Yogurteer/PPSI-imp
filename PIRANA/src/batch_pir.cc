@@ -3,7 +3,8 @@
 
 std::vector<Element> my_batch_pir_main(const uint64_t num_payloads, const uint64_t payload_size,
                     const uint64_t num_query, const bool is_batch,
-                    const bool is_compress, std::vector<std::vector<uint64_t>> input_db, std::vector<uint32_t> query_indices, double& online_time) {
+                    const bool is_compress, std::vector<std::vector<uint64_t>> input_db, 
+                    std::vector<uint32_t> query_indices, double& online_time, size_t& com_bytes) {
   std::cout << "Start my batch PIR! " << std::endl;
   Timer timer;
   timer.reset();
@@ -225,7 +226,9 @@ std::vector<Element> my_batch_pir_main(const uint64_t num_payloads, const uint64
 
   std::cout << "Response size: " << response.str().size() / 1024.0 << " KBytes"
             << std::endl;
-            
+  
+  com_bytes = query.str().size() + response.str().size();
+  
   return results;
 }
 
@@ -241,7 +244,8 @@ std::vector<Element> my_direct_batch_pir_main(
     std::vector<std::vector<uint64_t>> input_db, 
     std::vector<uint32_t> query_indices, 
     uint64_t col_size, 
-    double& online_time) {
+    double& online_time,
+    size_t& com_bytes) {
 
   std::cout << "Start Direct Batch PIR (Skip Cuckoo)! " << std::endl;
   Timer timer;
@@ -400,6 +404,8 @@ std::vector<Element> my_direct_batch_pir_main(
   std::cout << "Direct Batch PIR online time: " << online_time << " ms " << std::endl;
   std::cout << "Query size: " << query.str().size() / 1024.0 << " KBytes" << std::endl;
   std::cout << "Response size: " << response.str().size() / 1024.0 << " KBytes" << std::endl;
+
+  com_bytes = query.str().size() + response.str().size();
 
   return results;
 }

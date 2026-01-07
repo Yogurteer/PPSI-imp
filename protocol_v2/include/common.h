@@ -26,10 +26,23 @@
 using Element = std::vector<unsigned char>;
 using ElementVector = std::vector<Element>;
 
+// 测量ElementVector总字节数
+inline size_t get_payload_size(const ElementVector& ev) {
+    size_t total_bytes = 0;
+    
+    // 方法 1：简单的遍历累加 (推荐，清晰明了)
+    for (const auto& element : ev) {
+        // element.size() 返回的是内部 unsigned char 的数量，即字节数
+        total_bytes += element.size();
+    }
+
+    return total_bytes;
+}
+
 // 【新增】配置部分
 namespace MTConfig {
     // 默认并行线程数，设置为0则使用系统最大线程数
-    constexpr int OMP_THREAD_COUNT = 8; 
+    constexpr int OMP_THREAD_COUNT = 64; 
 }
 
 // 辅助函数: 获取实际使用的线程数
