@@ -340,6 +340,7 @@ bool run_oos_ot(
     const std::vector<std::vector<Element>>& sender_inputs,
     const std::vector<size_t>& receiver_choices,
     std::vector<Element>& receiver_outputs,
+    size_t& com_bytes,
     uint32_t input_bit_count,
     bool malicious) {
     
@@ -394,6 +395,9 @@ bool run_oos_ot(
         
         double base_time = std::chrono::duration<double, std::milli>(base_end - base_start).count();
         
+        // 记录 Base OT 后的通信量
+        size_t bytes_after_base = socks[0].bytesReceived() + socks[1].bytesReceived();
+        
         // Extension阶段
         auto ext_start = std::chrono::high_resolution_clock::now();
         
@@ -409,6 +413,9 @@ bool run_oos_ot(
         
         double ext_time = std::chrono::duration<double, std::milli>(ext_end - ext_start).count();
         double total_time = std::chrono::duration<double, std::milli>(total_end - start_time).count();
+        
+        // 计算总通信量（双向）
+        com_bytes = socks[0].bytesReceived() + socks[1].bytesReceived();
         
         return true;
         

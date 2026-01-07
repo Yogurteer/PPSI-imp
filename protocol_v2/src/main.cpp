@@ -2,6 +2,8 @@
 #include "receiver.h"
 #include "config.h"
 #include "oos_ot.h"
+#include "network.h"
+#include "common.h"
 #include "../../PIRANA/src/client.h"
 #include "../../PIRANA/src/server.h"
 #include "../../PIRANA/src/pir_parms.h"
@@ -24,6 +26,7 @@ using namespace std::chrono;
 // 全局文件路径配置 (这些可以保留为全局或也改为参数，暂且保留)
 const string DATA_FILE = "../data/kv_2_24.txt";
 const string result_file = "../result/PPSI_dif_size.txt";
+NetworkChannel network_channel;
 
 // 辅助函数: 从PIR answer提取payload
 std::vector<uint64_t> extract_payload_slots_from_answer(
@@ -77,14 +80,14 @@ std::vector<Element> run_batch_pir(
     size_t row_size,
     size_t payload_size,
     double &online_time,
-    std::string batch_PIR_mode) {
+    std::string batch_PIR_mode, 
+    size_t& com_bytes) {
     
     std::vector<Element> results;
     
     uint64_t num_payloads = database_items.size();
     uint64_t num_query = query_indices.size();
     
-    // Direct Mode 默认开启压缩以提高效率
     bool is_batch = true;
     bool is_compress = false; 
     
@@ -110,8 +113,7 @@ std::vector<Element> run_batch_pir(
     std::cout << "[数据预处理] plain_modulus_bit=" << plain_modulus_bit << std::endl;
     std::cout << "[数据预处理] 每个payload需要 " << expected_num_payload_slot << " slots" << std::endl;
     std::cout << "[数据预处理] 每个slot可存储 " << (plain_modulus_bit - 1) << " bits" << std::endl;
-    
-    // --- 数据转换逻辑保持不变 ---
+
     // 将 Element (字节向量) 转换为 uint64_t 向量
     std::vector<std::vector<uint64_t>> input_db(num_payloads);
     
@@ -155,21 +157,15 @@ std::vector<Element> run_batch_pir(
     
     std::cout << "[数据预处理] 完成，转换了 " << num_payloads << " 个payloads" << std::endl;
 
-    // 【关键修改 2】调用新的 Direct Batch PIR 函数
-    // 注意：你需要确保 batch_pir.cc 中的 my_direct_batch_pir_main 定义中增加了 col_size 参数
-    // 这里的 row_size 就是子桶容量，对应 PIR 中的 col_size
-    // results = my_direct_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
-    //                is_compress, input_db, query_indices, row_size, online_time);
-    // 能正常运行的非紧凑Batch PIR调用 
     if(batch_PIR_mode == "direct")
     {
         results = my_direct_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
-                       is_compress, input_db, query_indices, row_size, online_time);
+                       is_compress, input_db, query_indices, row_size, online_time, com_bytes);
     }
     else // default mode
     {
         results = my_batch_pir_main(num_payloads, payload_size, num_query, is_batch,
-                       is_compress, input_db, query_indices, online_time);
+                       is_compress, input_db, query_indices, online_time, com_bytes);
     }
                    
     return results;
@@ -267,24 +263,29 @@ void phase0_initialize_data(
 }
 
 // Phase 1: DH-OPRF + PRP
-void phase1_oprf_prp(LPSISender& sender, LPSIReceiver& receiver, double& receiver_oprf_time) {
+void phase1_oprf_prp(LPSISender& sender, LPSIReceiver& receiver, double& receiver_oprf_time, size_t& com_bytes) {
     // std::cout << "\n[Phase 1] DH-OPRF + PRP" << std::endl;
     MyTimer timer;
 
     // Step 1: Receiver -> Sender，默认离线阶段完成
     ElementVector step1_output = receiver.compute_oprf_step1();
 
-    timer.reset(); // 开始在线响应时间计时
     // Step 2: Sender -> Receiver (Sender进行PRP打乱,但不告诉Receiver映射关系)
+    timer.reset(); // 开始在线响应时间计时
     std::vector<size_t> shuffle_map;  // Sender内部使用,不发送给Receiver
     ElementVector step2_output = sender.process_oprf_step2(step1_output, &shuffle_map);
+
     // Step 3: Receiver计算Y' (不知道PRP映射)
     receiver.process_oprf_step3(step2_output);  // 不传递 shuffle_map
     auto oprf_time = timer.elapsed();
     receiver_oprf_time = oprf_time;
+    
+    size_t step1_com_bytes = get_payload_size(step1_output);
+    size_t step2_com_bytes = get_payload_size(step2_output);
+    com_bytes = step1_com_bytes + step2_com_bytes;
 
-    // 调试: Receiver获取sender的r_s和shuffle_map进行对照验证
-    receiver.verify_oprf_correctness(sender.get_r_s(), shuffle_map, step2_output);
+    // // 调试: Receiver获取sender的r_s和shuffle_map进行对照验证
+    // receiver.verify_oprf_correctness(sender.get_r_s(), shuffle_map, step2_output);
     
     timer.reset();
     // Sender计算X'
@@ -385,7 +386,8 @@ void phase4_execute_pir(
     const std::vector<uint32_t>& queries,
     size_t item_size,
     double &online_time,
-    std::string batch_PIR_mode) {
+    std::string batch_PIR_mode, 
+    size_t& com_bytes) {
     
     // 获取数据库的行列结构
     size_t sender_num_main_buckets = sender.get_num_main_buckets();
@@ -395,7 +397,7 @@ void phase4_execute_pir(
 
     std::cout << "---------------Call Batch PIR-----------------------" << std::endl;
     
-    std::vector<Element> pir_results = run_batch_pir(database, queries, num_rows, row_size, item_size, online_time, batch_PIR_mode);
+    std::vector<Element> pir_results = run_batch_pir(database, queries, num_rows, row_size, item_size, online_time, batch_PIR_mode, com_bytes);
 
     receiver.pir_results = pir_results;
     
@@ -433,7 +435,7 @@ void phase5_ot_bucket_keys(
     LPSISender& sender,
     LPSIReceiver& receiver,
     std::vector<Element>& bucket_keys,
-    size_t len_byte_r) {
+    size_t len_byte_r, size_t& com_bytes) {
     
     std::cout << "\n---------------Call OOS OT-----------------------" << std::endl;
     
@@ -491,7 +493,7 @@ if (!sender.prepare_ot_inputs(receiver_choices.size())) {
     
     // 执行OT协议
     std::vector<Element> ot_outputs;
-    bool ot_success = run_oos_ot(sender_ot_inputs, receiver_choices, ot_outputs, 
+    bool ot_success = run_oos_ot(sender_ot_inputs, receiver_choices, ot_outputs, com_bytes,
                                   input_bit_count, true);
     
     if (!ot_success) {
@@ -539,8 +541,7 @@ void phase6_decrypt_and_verify(
     }
     
     std::cout << "[交集数据验证] " << valid_count << "/" << intersection.size() << " 个正确"<< std::endl;
-    // 验证逻辑：Receiver取了16个交集，或者全部是交集？
-    // 原逻辑：RECEIVER_SIZE 全部都是交集
+
     if (intersection.size() == receiver_size && sender.get_intersection_size() == intersection.size() && sender.get_intersection_size() != 0) {
         std::cout << "\n[Final 正确性验证]✓ 协议执行正确" << std::endl;
     } else {
@@ -563,6 +564,7 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     LPSISender sender;
     LPSIReceiver receiver;
     
+    
     std::vector<std::pair<std::string, std::string>> sender_raw_data;
     std::vector<std::string> receiver_raw_data;
 
@@ -583,8 +585,10 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     // [2] DH-OPRF
     std::cout << "\n[2] 正在执行: DH-OPRF..." << std::endl;
     double receiver_oprf_time = 0.0;
-    phase1_oprf_prp(sender, receiver, receiver_oprf_time);
+    size_t p1_com_bytes = 0;
+    phase1_oprf_prp(sender, receiver, receiver_oprf_time, p1_com_bytes);
     auto dur_oprf = receiver_oprf_time;
+    cout << "[OPRF] 通信开销: " << p1_com_bytes << " Bytes" << std::endl;
 
     // [3] Hash Buckets
     std::cout << "\n[3] 正在执行: 构造双层Hash..." << std::endl;
@@ -613,7 +617,9 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     phase3_prepare_pir(sender, receiver, database, queries, pir_db_size, item_size);
     // 执行PIR (Cryptographic operations)
     double batch_pir_online_time = 0.0;
-    phase4_execute_pir(receiver, sender, database, queries, item_size, batch_pir_online_time, batch_PIR_mode);
+    size_t p4_com_bytes = 0;
+    phase4_execute_pir(receiver, sender, database, queries, item_size, batch_pir_online_time, batch_PIR_mode, p4_com_bytes);
+    cout << "[Batch PIR] 通信开销: " << p4_com_bytes << " Bytes" << std::endl;
     auto dur_pir = batch_pir_online_time; // 转换为毫秒
     
     // --- 模拟PIR与验证 (不计入时间) ---
@@ -638,11 +644,13 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     auto t4_start = high_resolution_clock::now();
     std::vector<Element> bucket_keys;
     size_t len_byte_r = LPSIConfig::BUCKET_KEY_SIZE_BYTES;
+    size_t p5_com_bytes = 0;
 
-    phase5_ot_bucket_keys(sender, receiver, bucket_keys, len_byte_r);
+    phase5_ot_bucket_keys(sender, receiver, bucket_keys, len_byte_r, p5_com_bytes);
     
     auto t4_end = high_resolution_clock::now();
     auto dur_ot = duration_cast<milliseconds>(t4_end - t4_start).count();
+    cout << "[OT] 通信开销: " << p5_com_bytes << " Bytes" << std::endl;
 
     // [6] Decrypt
     std::cout << "\n[6] 正在执行: 解密验证..." << std::endl;
@@ -693,6 +701,17 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     std::cout << std::left  << std::setw(LABEL_WIDTH) << "总协议执行时间:" 
             << std::right << std::setw(TIME_WIDTH)  << total_protocol_time << " ms" << std::endl;
     std::cout << "(Total = 2+3+4+5+6, 不含初始化)" << std::endl;
+    std::cout << "========================================" << std::endl;
+
+    // 输出总通信开销
+    size_t total_com_bytes = p1_com_bytes + p4_com_bytes + p5_com_bytes;
+    std::cout << "\n========================================" << std::endl;
+    std::cout << "        协议执行总通信开销统计" << std::endl; 
+    std::cout << "========================================" << std::endl;
+    // 换算成KB
+    std::cout << "总通信开销: " << total_com_bytes << " Bytes" << " (" << (double)total_com_bytes / 1024.0 << " KB)" << std::endl;
+    std::cout << "(DH-OPRF " << p1_com_bytes << " Bytes, Batch PIR " << p4_com_bytes 
+              << " Bytes, OT " << p5_com_bytes << " Bytes)" << std::endl;
     std::cout << "========================================" << std::endl;
 
     // 格式化汇总输出 (单位: 秒)

@@ -103,7 +103,8 @@ bool run_oos_ot(
     const std::vector<std::vector<Element>>& sender_inputs,
     const std::vector<size_t>& receiver_choices,
     std::vector<Element>& receiver_outputs,
-    uint32_t input_bit_count = 8,
+    size_t& com_bytes,
+    uint32_t input_bit_count,
     bool malicious = true);
 
 #endif // OOS_OT_H
