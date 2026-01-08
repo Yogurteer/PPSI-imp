@@ -84,7 +84,7 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
 
   _enable_rotate = false;
 
-  uint64_t poly_degree = 4096; 
+  uint64_t poly_degree = 8192; 
   std::vector<int> coeff_modulus;
   if (poly_degree == 4096) coeff_modulus = {48, 32, 24};
   else if (poly_degree == 8192) coeff_modulus = {56, 56, 24, 24};
@@ -121,7 +121,7 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
     _bundle_size = 1;
   }
 
-  std::cout << "Direct Mode: Building deterministic buckets..." << std::endl;
+  // std::cout << "Direct Mode: Building deterministic buckets..." << std::endl;
   
   _bucket.resize(_table_size);
   // 已知num_payloads<= _table_size * _col_size

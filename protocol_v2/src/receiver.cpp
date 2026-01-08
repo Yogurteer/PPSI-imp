@@ -388,12 +388,12 @@ void LPSIReceiver::build_hash_buckets(size_t bucket_count, int num_hash_funcs)
         throw std::runtime_error("主桶映射失败，存在冲突或未映射的元素");
     }
     
-    std::cout << "Receiver: 主哈希桶数量 = " << bucket_count << std::endl;
+    // std::cout << "Receiver: 主哈希桶数量 = " << bucket_count << std::endl;
 }
 
 // Phase 2: 构建子哈希桶 (Receiver使用多路Simple Hash - 生成nh个候选位置)
 void LPSIReceiver::build_sub_buckets(size_t sender_data_size, size_t num_main_buckets, int nh) {
-    std::cout << "Receiver: 构建子哈希桶 (3way Simple Hash)..." << std::endl;
+    // std::cout << "Receiver: 构建子哈希桶 (3way Simple Hash)..." << std::endl;
     
     // Receiver不需要实际构建子桶，只需要在Phase3使用Sender的容量参数计算hash
     // 这里仅预留结构用于验证
@@ -535,7 +535,7 @@ size_t LPSIReceiver::get_total_queries() const {
 void LPSIReceiver::process_pir_results(const std::vector<Element>& results) {
     // std::cout << "\nReceiver: 处理PIR结果..." << std::endl;
     pir_results = results;
-    std::cout << "Receiver: 收到 " << results.size() << " 个PIR结果" << std::endl;
+    // std::cout << "Receiver: 收到 " << results.size() << " 个PIR结果" << std::endl;
     
     hit_element_indices.clear();
     hit_sub_bucket_indices.clear();
@@ -593,9 +593,9 @@ void LPSIReceiver::process_pir_results(const std::vector<Element>& results) {
             result_idx++;  // 移动到下一个结果
         }
         
-        if (!found_hit && is_valid_bucket) {
-            std::cout << "主桶[" << main_idx << "] 元素[" << elem_idx << "]: 未命中 (所有" << sender_nh << "个查询都未找到)" << std::endl;
-        }
+        // if (!found_hit && is_valid_bucket) {
+        //     std::cout << "主桶[" << main_idx << "] 元素[" << elem_idx << "]: 未命中 (所有" << sender_nh << "个查询都未找到)" << std::endl;
+        // }
     }
     
     std::cout << "总计: 命中 " << hit_element_indices.size() << "/" << Y_prime.size() << " 个元素" << std::endl;
