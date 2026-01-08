@@ -9,11 +9,11 @@ NC='\033[0m' # No Color
 
 # ================= 配置区域 =================
 # Sender 规模: 2^8(256), 2^12(4096), 2^16(65536) 2^20 2^24
-SENDER_SIZES=(1048576 16777216)
+SENDER_SIZES=(1048576)
 # SENDER_SIZES=(16777216)
 
 # Receiver 规模: 1, 2^6(64), 2^7(128), 2^8(256), 2^9(512), 2^10(1024)
-RECEIVER_SIZES=(1 64 128 256 512 1024 2048 4096)
+RECEIVER_SIZES=(1 64 128 256 512 1024)
 
 # Payload 大小
 PAYLOAD_SIZE=1
@@ -41,7 +41,7 @@ fi
 cd build
 
 echo -e "${GREEN}运行CMake配置...${NC}"
-# 【修改】去掉 Release，保持和你的一致
+
 cmake .. > /dev/null 2>&1
 
 if [ $? -ne 0 ]; then

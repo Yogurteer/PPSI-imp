@@ -127,7 +127,7 @@ void test_direct_batch_pir_correctness(Server &server,
                                        std::vector<std::vector<uint64_t>> &answer,
                                        const std::vector<uint32_t> &query_indices,
                                        PirParms &pir_parms) {
-    std::cout << "Inner Direct Batch PIR correctness check..." << std::endl;
+    // std::cout << "Inner Direct Batch PIR correctness check..." << std::endl;
 
     // 获取压缩参数
     bool is_compress = pir_parms.get_is_compress();
@@ -195,7 +195,7 @@ void test_direct_batch_pir_correctness(Server &server,
             }
         }
     }
-    std::cout << "Direct PIR correctness check passed!" << std::endl;
+    std::cout << "Inner Direct PIR correctness check passed!" << std::endl;
 }
 
 void test_mulptiply(SEALContext &context, EncryptionParameters &parms,

@@ -109,10 +109,10 @@ std::vector<Element> run_batch_pir(
     auto plain_modulus_bit = temp_pir_parms->get_seal_parms().plain_modulus().bit_count();
     auto expected_num_payload_slot = temp_pir_parms->get_num_payload_slot();
     
-    std::cout << "\n[数据预处理] payload_size=" << payload_size << " bytes" << std::endl;
-    std::cout << "[数据预处理] plain_modulus_bit=" << plain_modulus_bit << std::endl;
-    std::cout << "[数据预处理] 每个payload需要 " << expected_num_payload_slot << " slots" << std::endl;
-    std::cout << "[数据预处理] 每个slot可存储 " << (plain_modulus_bit - 1) << " bits" << std::endl;
+    // std::cout << "\n[数据预处理] payload_size=" << payload_size << " bytes" << std::endl;
+    // std::cout << "[数据预处理] plain_modulus_bit=" << plain_modulus_bit << std::endl;
+    // std::cout << "[数据预处理] 每个payload需要 " << expected_num_payload_slot << " slots" << std::endl;
+    // std::cout << "[数据预处理] 每个slot可存储 " << (plain_modulus_bit - 1) << " bits" << std::endl;
 
     // 将 Element (字节向量) 转换为 uint64_t 向量
     std::vector<std::vector<uint64_t>> input_db(num_payloads);
@@ -155,7 +155,7 @@ std::vector<Element> run_batch_pir(
         }
     }
     
-    std::cout << "[数据预处理] 完成，转换了 " << num_payloads << " 个payloads" << std::endl;
+    // std::cout << "[数据预处理] 完成，转换了 " << num_payloads << " 个payloads" << std::endl;
 
     if(batch_PIR_mode == "direct")
     {
@@ -749,7 +749,7 @@ int main(int argc, char** argv) {
             case 'p':
                 payload_size = std::stoul(optarg);
 
-                LPSIConfig::PIR_PAYLOAD_SIZE = 256; // label byte length
+                LPSIConfig::PIR_PAYLOAD_SIZE = 128; // label byte length
                 break;
             case 'm':
                 // 1-default mode, 0-direct mode

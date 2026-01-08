@@ -236,7 +236,7 @@ void LPSISender::reshuffle_data() {
 
 // Phase 2: 构建主哈希桶 (3-way Simple Hash - Sender建立多副本)
 void LPSISender::build_hash_buckets(size_t num_main_buckets, int num_hash_funcs) {
-    std::cout << "Sender: 构建主哈希桶 (3-way Simple Hash)..." << std::endl;
+    // std::cout << "Sender: 构建主哈希桶 (3-way Simple Hash)..." << std::endl;
     
     // 与Receiver保持一致，使用配置文件中的倍数参数
 
@@ -324,7 +324,7 @@ void LPSISender::build_sub_buckets(size_t sender_data_size, size_t num_main_buck
               << " -> 每个子桶capacity=" << sub_bucket_capacity 
               << ", 总容量=" << (sub_bucket_capacity * nh) << std::endl;
     
-    std::cout << "Sender: 构建子哈希桶 (每个主桶独立Cuckoo Hash)..." << std::endl;
+    // std::cout << "Sender: 构建子哈希桶 (每个主桶独立Cuckoo Hash)..." << std::endl;
     
     X_sub_star.resize(X_star.size());
     
@@ -471,9 +471,9 @@ void LPSISender::prepare_pir_database() {
     phase3_log.close();
     
     std::cout << "Sender: PIR数据库准备完成" << std::endl;
-    std::cout << "  总行数: " << row_idx << " (每个子桶1行)" << std::endl;
-    std::cout << "  每行大小: " << X_sub_star[0][0].size() << " slots" << std::endl;
-    std::cout << "  非空slots: " << non_empty << " / " << flattened_database.size() << std::endl;
+    // std::cout << "  总行数: " << row_idx << " (每个子桶1行)" << std::endl;
+    // std::cout << "  每行大小: " << X_sub_star[0][0].size() << " slots" << std::endl;
+    // std::cout << "  非空slots: " << non_empty << " / " << flattened_database.size() << std::endl;
     // PIR数据库相比原始sender size的膨胀率
     double inflation = static_cast<double>(flattened_database.size()) / static_cast<double>(input_data.size());
     std::cout << "  PIR输入数据库相比原始数据集X膨胀率: x" << inflation << std::endl;
