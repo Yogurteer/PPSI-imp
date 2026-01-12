@@ -98,6 +98,8 @@ private:
 // sender_inputs[i][j]: 第i个OT的第j个可选值
 // receiver_choices[i]: 第i个OT的选择索引
 // receiver_outputs[i]: 第i个OT恢复的值
+// offline_time_ms: 离线阶段时间开销 (Base OT)
+// online_time_ms: 在线阶段时间开销 (Extension)
 // 返回: true表示成功
 bool run_oos_ot(
     const std::vector<std::vector<Element>>& sender_inputs,
@@ -105,6 +107,8 @@ bool run_oos_ot(
     std::vector<Element>& receiver_outputs,
     size_t& com_bytes,
     uint32_t input_bit_count,
-    bool malicious = true);
+    bool malicious = true,
+    double* offline_time_ms = nullptr,
+    double* online_time_ms = nullptr);
 
 #endif // OOS_OT_H

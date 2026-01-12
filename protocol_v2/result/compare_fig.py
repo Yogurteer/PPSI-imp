@@ -1,44 +1,62 @@
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
+import os
 
-# 读取数据
-filename = "对比结果.xlsx - Sheet1.csv"
-df = pd.read_csv(filename)
+# 获取脚本所在目录的绝对路径
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# 准备绘图数据
-# 提取X轴标签（即列名中的2^0, 2^6等）
-x_labels = df.columns[1:]
-# 提取对应的Y轴数值
-our_scheme_vals = df.loc[df['Unnamed: 0'] == 'Our Scheme'].values[0][1:]
-apsi_vals = df.loc[df['Unnamed: 0'] == 'APSI'].values[0][1:]
+# 1. 数据读取与预处理
+# 注意:您的CSV文件第一行是元数据,真正的表头在第二行,因此设置 header=1
+csv_path = os.path.join(script_dir, 'scheme_compare.csv')
+df = pd.read_csv(csv_path, header=1)
 
-# 设置绘图参数
-x = np.arange(len(x_labels))  # 标签位置
-width = 0.35  # 柱状图宽度
+# 转置数据：行变为 Receiver Data Size，列变为方案
+plot_data = df.set_index('scheme').T
 
-# 创建图表
-fig, ax = plt.subplots(figsize=(10, 6))
+# -------------------------------------------------------------------------
+# [核心修正]：处理 LaTeX 上标格式
+# 定义一个函数，将 "2^10" 这种字符串转换为 "$2^{10}$" (带花括号)
+# -------------------------------------------------------------------------
+def format_latex_label(label):
+    # 检查是否包含 '^' 符号
+    if '^' in label:
+        base, exponent = label.split('^')
+        # f-string 中使用 {{ }} 来表示字面量的花括号
+        # 结果会变成: $base^{exponent}$
+        return f"${base}^{{{exponent}}}$"
+    return label
+
+# 应用转换到索引上
+plot_data.index = [format_latex_label(x) for x in plot_data.index]
+
+# 2. 绘图设置 (学术风格)
+plt.rcParams['font.family'] = 'serif'   # 衬线字体
+plt.rcParams['mathtext.fontset'] = 'cm' # 数学公式使用 Computer Modern 字体
+
+fig, ax = plt.subplots(figsize=(8, 5))
 
 # 绘制柱状图
-# 使用学术界常用的深蓝和深橙配色，并添加黑色边框增加清晰度
-rects1 = ax.bar(x - width/2, our_scheme_vals, width, label='Our Scheme', color='#4c72b0', edgecolor='black', linewidth=0.5)
-rects2 = ax.bar(x + width/2, apsi_vals, width, label='APSI', color='#dd8452', edgecolor='black', linewidth=0.5)
+# zorder=3 让柱子显示在网格线之上
+plot_data.plot(kind='bar', ax=ax, width=0.7, rot=0, edgecolor='black', alpha=0.85, zorder=3)
 
-# 设置标签和标题
-ax.set_xlabel('Receiver Size')
-ax.set_ylabel('Online Time (s)')
-ax.set_xticks(x)
-ax.set_xticklabels(x_labels)
-ax.legend()
+# 3. 图表修饰
+ax.set_xlabel("Receiver Data Size", fontsize=12, labelpad=10, fontweight='bold')
+ax.set_ylabel("Online Time (s)", fontsize=12, labelpad=10, fontweight='bold')
 
-# 添加网格线以辅助读数（仅保留Y轴网格，且置于底层）
-ax.yaxis.grid(True, linestyle='--', which='major', color='grey', alpha=.25)
-ax.set_axisbelow(True)
+# 设置网格线 (zorder=0 让网格线在柱子后面)
+ax.grid(axis='y', linestyle='--', alpha=0.5, zorder=0)
 
-# 调整布局防止标签重叠
-fig.tight_layout()
+# 设置图例
+ax.legend(title="Scheme", fontsize=10, loc='upper left')
 
-# 保存图片
-output_filename = 'performance_comparison_bar_chart.png'
-plt.savefig(output_filename, dpi=300)
+# 紧凑布局
+plt.tight_layout()
+
+# 4. 保存与显示
+# 保存为高分辨率图片,适合插入论文 (dpi=300)
+output_path = os.path.join(script_dir, 'lpsi_performance_comparison.png')
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+plt.show()
+
+print(f"Figure saved to {output_path}")

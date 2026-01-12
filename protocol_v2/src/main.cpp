@@ -28,50 +28,6 @@ const string DATA_FILE = "../data/kv_2_24.txt";
 const string result_file = "../result/PPSI_dif_size.txt";
 NetworkChannel network_channel;
 
-// 辅助函数: 从PIR answer提取payload
-std::vector<uint64_t> extract_payload_slots_from_answer(
-    const std::vector<std::vector<uint64_t>>& answer,
-    uint32_t index,
-    PirParms& pir_parms) {
-    
-    auto N = pir_parms.get_seal_parms().poly_modulus_degree();
-    auto half_N = N / 2;
-    auto num_slot = pir_parms.get_num_payload_slot();
-    
-    std::vector<uint64_t> result;
-    result.reserve(num_slot);
-    
-    uint32_t count = 0;
-    uint64_t left_rotate_slot =
-        std::ceil(static_cast<double>(num_slot) / pir_parms.get_pre_rotate());
-    
-    for (uint32_t i = 0; i < answer.size() && count < num_slot; i++) {
-        auto row_index = index / half_N;
-        auto offset =
-            (index - std::min(left_rotate_slot, pir_parms.get_rotate_step())) %
-            half_N;
-        for (uint32_t j = 0; j < pir_parms.get_rotate_step() && count < num_slot; j++) {
-            for (uint32_t k = 0; k < pir_parms.get_pre_rotate() / 2 && count < num_slot; k++) {
-                uint32_t idx = row_index * half_N +
-                    (k * pir_parms.get_rotate_step() + j + offset) % half_N;
-                auto response_item = answer[i][idx % N];
-                result.push_back(response_item);
-                count++;
-            }
-            for (uint32_t k = 0; k < pir_parms.get_pre_rotate() / 2 && count < num_slot; k++) {
-                uint32_t idx = (row_index + 1) * half_N +
-                    (k * pir_parms.get_rotate_step() + j + offset) % half_N;
-                auto response_item = answer[i][idx % N];
-                result.push_back(response_item);
-                count++;
-            }
-        }
-        left_rotate_slot -= pir_parms.get_rotate_step();
-    }
-    
-    return result;
-}
-
 // Batch PIR 接口更新
 std::vector<Element> run_batch_pir(
     const std::vector<Element>& database_items,
@@ -263,12 +219,15 @@ void phase0_initialize_data(
 }
 
 // Phase 1: DH-OPRF + PRP
-void phase1_oprf_prp(LPSISender& sender, LPSIReceiver& receiver, double& receiver_oprf_time, size_t& com_bytes) {
+void phase1_oprf_prp(LPSISender& sender, LPSIReceiver& receiver, double& oprf_online_time, double& oprf_offline_time, size_t& com_bytes) {
     // std::cout << "\n[Phase 1] DH-OPRF + PRP" << std::endl;
     MyTimer timer;
+    oprf_offline_time = 0.0;
 
     // Step 1: Receiver -> Sender，默认离线阶段完成
+    timer.reset(); // 开始在线请求时间计时
     ElementVector step1_output = receiver.compute_oprf_step1();
+    oprf_offline_time += timer.elapsed();
 
     // Step 2: Sender -> Receiver (Sender进行PRP打乱,但不告诉Receiver映射关系)
     timer.reset(); // 开始在线响应时间计时
@@ -278,7 +237,7 @@ void phase1_oprf_prp(LPSISender& sender, LPSIReceiver& receiver, double& receive
     // Step 3: Receiver计算Y' (不知道PRP映射)
     receiver.process_oprf_step3(step2_output);  // 不传递 shuffle_map
     auto oprf_time = timer.elapsed();
-    receiver_oprf_time = oprf_time;
+    oprf_online_time = oprf_time;
     
     size_t step1_com_bytes = get_payload_size(step1_output);
     size_t step2_com_bytes = get_payload_size(step2_output);
@@ -291,7 +250,8 @@ void phase1_oprf_prp(LPSISender& sender, LPSIReceiver& receiver, double& receive
     // Sender计算X'
     sender.compute_X_prime();
     auto compute_X_prf = timer.elapsed();
-    std::cout << "Compute X prf time: " << compute_X_prf << " ms " << std::endl;
+    oprf_offline_time += compute_X_prf;
+    // std::cout << "Compute X prf time: " << compute_X_prf << " ms " << std::endl;
 }
 
 // Phase 2: 构建哈希桶
@@ -300,7 +260,8 @@ void phase2_build_hash_buckets(
     LPSIReceiver& receiver,
     size_t sender_data_size,
     size_t receiver_data_size,
-    double& receiver_gen_idx_time) {
+    double& receiver_gen_idx_time,
+    double& sender_gen_idx_time) {
     
     MyTimer timer;
     
@@ -312,15 +273,16 @@ void phase2_build_hash_buckets(
     size_t num_main_buckets = static_cast<size_t>(LPSIConfig::MAIN_BUCKET_FACTOR * receiver_data_size);
     
     // 构建数据库索引 - 使用配置文件中的倍数参数
+    timer.reset();
     sender.build_hash_buckets(num_main_buckets, LPSIConfig::OUTER_NUM_HASH_FUNCTIONS);
     sender.build_sub_buckets(sender_data_size, num_main_buckets, LPSIConfig::NUM_SUB_BUCKETS);
+    sender_gen_idx_time = timer.elapsed();
     
     timer.reset();
     // 生成查询索引
     receiver.build_hash_buckets(num_main_buckets, LPSIConfig::OUTER_NUM_HASH_FUNCTIONS);
     receiver.build_sub_buckets(sender_data_size, num_main_buckets, LPSIConfig::NUM_SUB_BUCKETS);
-    auto gen_idx_time = timer.elapsed();
-    receiver_gen_idx_time = gen_idx_time;
+    receiver_gen_idx_time = timer.elapsed();
     
     // std::cout << "✓ 哈希桶构建完成" << std::endl;
 }
@@ -332,12 +294,16 @@ void phase3_prepare_pir(
     std::vector<Element>& database,
     std::vector<uint32_t>& queries,
     size_t& pir_db_size,
-    size_t& item_size) {
+    size_t& item_size,
+    double& offline_pir_prep_time) {
     
     // std::cout << "\n[Phase 3] 准备PIR数据库和查询" << std::endl;
     
     // Sender准备PIR数据库
+    MyTimer timer;
+    timer.reset();
     sender.prepare_pir_database(); //内部输出pirdb膨胀率等信息
+    offline_pir_prep_time = timer.elapsed();
     
     // Sender发送桶结构信息给Receiver
     size_t sender_num_main_buckets = sender.get_num_main_buckets();
@@ -350,25 +316,6 @@ void phase3_prepare_pir(
     size_t num_items;
     database = sender.get_pir_database_as_bytes(num_items, item_size);
     queries = receiver.get_query_indices_flat();
-    
-    // std::cout << "✓ PIR数据库: " << num_items << " 项, 每项 " << item_size << " 字节" << std::endl;
-    // std::cout << "✓ 查询索引: " << queries.size() << " 个" << std::endl;
-    
-    // // 将数据库大小调整为2的幂次
-    // pir_db_size = 1;
-    // while (pir_db_size < num_items) pir_db_size <<= 1;
-    
-    // // **关键修复**: 填充非0数据，避免PIR查询padding位置时返回transparent密文
-    // while (database.size() < pir_db_size) {
-    //     Element padding_item(item_size, 0);
-    //     // 填充固定模式的非0数据
-    //     for (size_t i = 0; i < item_size; ++i) {
-    //         padding_item[i] = static_cast<unsigned char>((i + database.size()) % 256);
-    //     }
-    //     database.push_back(padding_item);
-    // }
-    
-    // // std::cout << "✓ PIR数据库调整为 " << pir_db_size << " 项 (2的幂次)" << std::endl;
     
     // ===== 添加Phase2/3验证 =====
     // std::cout << "\n[双边映射正确性验证] 检查双层hash映射正确性..." << std::endl;
@@ -435,7 +382,9 @@ void phase5_ot_bucket_keys(
     LPSISender& sender,
     LPSIReceiver& receiver,
     std::vector<Element>& bucket_keys,
-    size_t len_byte_r, size_t& com_bytes) {
+    size_t len_byte_r, size_t& com_bytes,
+    double& ot_online_time,
+    double& ot_offline_time) {
     
     std::cout << "\n---------------Call OOS OT-----------------------" << std::endl;
     
@@ -456,10 +405,10 @@ void phase5_ot_bucket_keys(
     }
     
     // Sender准备OT输入，获取receiver请求的桶数量，作为sender最终output
-if (!sender.prepare_ot_inputs(receiver_choices.size())) {
-        std::cerr << "Sender OT桶密钥未初始化" << std::endl;
-        return;
-    }
+    if (!sender.prepare_ot_inputs(receiver_choices.size())) {
+            std::cerr << "Sender OT桶密钥未初始化" << std::endl;
+            return;
+        }
     
     // 获取Sender的OT输入 (所有桶密钥作为选项) ot_inputs[0] = bucket_keys
     std::vector<std::vector<Element>> sender_ot_base = sender.get_ot_inputs();
@@ -493,13 +442,20 @@ if (!sender.prepare_ot_inputs(receiver_choices.size())) {
     
     // 执行OT协议
     std::vector<Element> ot_outputs;
+    double ot_offline_time_ms = 0.0;
+    double ot_online_time_ms = 0.0;
     bool ot_success = run_oos_ot(sender_ot_inputs, receiver_choices, ot_outputs, com_bytes,
-                                  input_bit_count, true);
+                                  input_bit_count, true, &ot_offline_time_ms, &ot_online_time_ms);
+    ot_online_time = ot_online_time_ms;
+    ot_offline_time = ot_offline_time_ms;
     
     if (!ot_success) {
         std::cerr << "OT执行失败" << std::endl;
         return;
     }
+    
+    std::cout << "OT Offline时间: " << ot_offline_time_ms << " ms" << std::endl;
+    std::cout << "OT Online时间: " << ot_online_time_ms << " ms" << std::endl;
     
     // 将OT输出作为桶密钥
     bucket_keys = ot_outputs;
@@ -549,11 +505,6 @@ void phase6_decrypt_and_verify(
     }
 }
 
-void global_set_up() {
-    cout<< "setup"<<endl;
-    
-}
-
 int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std::string batch_PIR_mode) {
     std::cout << "========================================" << std::endl;
     std::cout << "   Payable LPSI协议 (动态参数分段计时)" << std::endl;
@@ -585,14 +536,17 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     // [2] DH-OPRF
     std::cout << "\n[2] 正在执行: DH-OPRF..." << std::endl;
     double receiver_oprf_time = 0.0;
+    double oprf_offline_time = 0.0;
     size_t p1_com_bytes = 0;
-    phase1_oprf_prp(sender, receiver, receiver_oprf_time, p1_com_bytes);
-    auto dur_oprf = receiver_oprf_time;
+    phase1_oprf_prp(sender, receiver, receiver_oprf_time, oprf_offline_time, p1_com_bytes);
+    auto dur_oprf_online = receiver_oprf_time;
+    auto dur_oprf_offline = oprf_offline_time;
     cout << "[OPRF] 通信开销: " << p1_com_bytes << " Bytes" << std::endl;
 
     // [3] Hash Buckets
     std::cout << "\n[3] 正在执行: 构造双层Hash..." << std::endl;
     double receiver_gen_idx_time = 0.0;
+    double sender_gen_idx_time = 0.0;
     
     // 填充receiver_raw_data到N的整数倍
     size_t original_receiver_size = receiver_raw_data.size();
@@ -600,9 +554,10 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     size_t N = gloal_parm.poly_degree;
     size_t ratio = (original_receiver_size + N - 1) / N; // 向上取整
     size_t pad_receiver_size = ratio * N;
-    phase2_build_hash_buckets(sender, receiver, sender_raw_data.size(), receiver_raw_data.size(), receiver_gen_idx_time);
+    phase2_build_hash_buckets(sender, receiver, sender_raw_data.size(), receiver_raw_data.size(), receiver_gen_idx_time, sender_gen_idx_time);
     // phase2_build_hash_buckets(sender, receiver, sender_raw_data.size(), pad_receiver_size, receiver_gen_idx_time);
-    auto dur_hash = receiver_gen_idx_time;
+    auto online_receiver_genidx_time = receiver_gen_idx_time;
+    auto offline_sender_genidx_time = sender_gen_idx_time;
 
     // ==========================================
     // 4. Batch PIR (Prepare + Execute)
@@ -612,15 +567,16 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     std::vector<Element> database;
     std::vector<uint32_t> queries;
     size_t pir_db_size, item_size;
+    double offline_pir_prep_time = 0.0;
+    double online_pir_process_time = 0.0;
 
     // 准备PIR (DB & Query Generation)
-    phase3_prepare_pir(sender, receiver, database, queries, pir_db_size, item_size);
+    phase3_prepare_pir(sender, receiver, database, queries, pir_db_size, item_size, offline_pir_prep_time);
+
     // 执行PIR (Cryptographic operations)
-    double batch_pir_online_time = 0.0;
     size_t p4_com_bytes = 0;
-    phase4_execute_pir(receiver, sender, database, queries, item_size, batch_pir_online_time, batch_PIR_mode, p4_com_bytes);
+    phase4_execute_pir(receiver, sender, database, queries, item_size, online_pir_process_time, batch_PIR_mode, p4_com_bytes);
     cout << "[Batch PIR] 通信开销: " << p4_com_bytes << " Bytes" << std::endl;
-    auto dur_pir = batch_pir_online_time; // 转换为毫秒
     
     // --- 模拟PIR与验证 (不计入时间) ---
     simulate_pir(receiver, sender, database, queries, item_size);
@@ -646,10 +602,13 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     size_t len_byte_r = LPSIConfig::BUCKET_KEY_SIZE_BYTES;
     size_t p5_com_bytes = 0;
 
-    phase5_ot_bucket_keys(sender, receiver, bucket_keys, len_byte_r, p5_com_bytes);
+    double ot_online_time = 0.0;
+    double ot_offline_time = 0.0;
+    phase5_ot_bucket_keys(sender, receiver, bucket_keys, len_byte_r, p5_com_bytes, ot_online_time, ot_offline_time);
     
     auto t4_end = high_resolution_clock::now();
-    auto dur_ot = duration_cast<milliseconds>(t4_end - t4_start).count();
+    // auto dur_ot = duration_cast<milliseconds>(t4_end - t4_start).count();
+    auto dur_ot = ot_online_time;
     cout << "[OT] 通信开销: " << p5_com_bytes << " Bytes" << std::endl;
 
     // [6] Decrypt
@@ -661,69 +620,136 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     auto dur_decrypt = duration_cast<milliseconds>(t5_end - t5_start).count();
 
     // ==========================================
-    // 汇总输出
+    // 汇总输出 - 重新整理
     // ==========================================
-    long long total_protocol_time = dur_oprf + dur_hash + dur_pir + dur_ot + dur_decrypt;
     
-    // 定义列宽常量，方便调整
-    const int LABEL_WIDTH = 32; // 标签列宽（因为包含中文，需要设大一点以保证对齐）
-    const int TIME_WIDTH  = 10; // 时间数值列宽
-
+    // 计算各阶段总时间
+    double total_offline_time = dur_oprf_offline + offline_sender_genidx_time + offline_pir_prep_time + ot_offline_time;
+    double total_online_time = dur_oprf_online + online_receiver_genidx_time + online_pir_process_time + ot_online_time + dur_decrypt;
+    double total_protocol_time = total_offline_time + total_online_time;
+    
+    // 定义列宽常量
+    const int LABEL_WIDTH = 40;
+    const int TIME_WIDTH  = 12;
+    
     std::cout << "\n========================================" << std::endl;
-    std::cout << "        协议执行在线耗时统计 (ms)" << std::endl;
+    std::cout << "        协议执行性能统计" << std::endl;
     std::cout << "========================================" << std::endl;
-
-    // 设置统一的小数格式：固定小数点，保留2位小数 (2 ms -> 2.00 ms)
+    
+    // 设置统一的小数格式：固定小数点，保留2位小数
     std::cout << std::fixed << std::setprecision(2);
-
-    std::cout << std::left  << std::setw(LABEL_WIDTH) << "1. 导入数据 (Init):" 
-            << std::right << std::setw(TIME_WIDTH)  << (double)dur_init << " ms" << std::endl;
-
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "0. 数据导入 (Init):" 
+              << std::right << std::setw(TIME_WIDTH) << (double)dur_init << " ms" << std::endl;
+    
+    std::cout << "\n----------------------------------------" << std::endl;
+    std::cout << "           离线阶段 (Offline)" << std::endl;
     std::cout << "----------------------------------------" << std::endl;
-
-    std::cout << std::left  << std::setw(LABEL_WIDTH) << "2. DH-OPRF:" 
-            << std::right << std::setw(TIME_WIDTH)  << dur_oprf << " ms" << std::endl;
-
-    std::cout << std::left  << std::setw(LABEL_WIDTH) << "3. 构造查询索引:" 
-            << std::right << std::setw(TIME_WIDTH)  << dur_hash << " ms" << std::endl;
-
-    std::cout << std::left  << std::setw(LABEL_WIDTH) << "4. Batch PIR:" 
-            << std::right << std::setw(TIME_WIDTH)  << dur_pir << " ms" << std::endl;
-
-    std::cout << std::left  << std::setw(LABEL_WIDTH) << "5. OT:" 
-            << std::right << std::setw(TIME_WIDTH)  << (double)dur_ot << " ms" << std::endl;
-
-    std::cout << std::left  << std::setw(LABEL_WIDTH) << "6. 解密结果:" 
-            << std::right << std::setw(TIME_WIDTH)  << (double)dur_decrypt << " ms" << std::endl;
-
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "1. OPRF (offline):" 
+              << std::right << std::setw(TIME_WIDTH) << dur_oprf_offline << " ms" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "2. 构造索引-Sender (offline):" 
+              << std::right << std::setw(TIME_WIDTH) << offline_sender_genidx_time << " ms" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "3. PIR准备-Sender (offline):" 
+              << std::right << std::setw(TIME_WIDTH) << offline_pir_prep_time << " ms" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "4. OT Base (offline):" 
+              << std::right << std::setw(TIME_WIDTH) << ot_offline_time << " ms" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << ">>> 离线阶段总计:" 
+              << std::right << std::setw(TIME_WIDTH) << total_offline_time << " ms" << std::endl;
+    
+    std::cout << "\n----------------------------------------" << std::endl;
+    std::cout << "           在线阶段 (Online)" << std::endl;
+    std::cout << "----------------------------------------" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "1. OPRF (online):" 
+              << std::right << std::setw(TIME_WIDTH) << dur_oprf_online << " ms" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "2. 构造索引-Receiver (online):" 
+              << std::right << std::setw(TIME_WIDTH) << online_receiver_genidx_time << " ms" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "3. PIR查询 (online):" 
+              << std::right << std::setw(TIME_WIDTH) << online_pir_process_time << " ms" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "4. OT Extension (online):" 
+              << std::right << std::setw(TIME_WIDTH) << ot_online_time << " ms" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "5. 解密验证 (online):" 
+              << std::right << std::setw(TIME_WIDTH) << (double)dur_decrypt << " ms" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << ">>> 在线阶段总计:" 
+              << std::right << std::setw(TIME_WIDTH) << total_online_time << " ms" << std::endl;
+    
+    std::cout << "\n========================================" << std::endl;
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "总协议执行时间:" 
+              << std::right << std::setw(TIME_WIDTH) << total_protocol_time << " ms" << std::endl;
     std::cout << "========================================" << std::endl;
-
-    std::cout << std::left  << std::setw(LABEL_WIDTH) << "总协议执行时间:" 
-            << std::right << std::setw(TIME_WIDTH)  << total_protocol_time << " ms" << std::endl;
-    std::cout << "(Total = 2+3+4+5+6, 不含初始化)" << std::endl;
-    std::cout << "========================================" << std::endl;
-
-    // 输出总通信开销
+    
+    // 输出通信开销统计
     size_t total_com_bytes = p1_com_bytes + p4_com_bytes + p5_com_bytes;
     std::cout << "\n========================================" << std::endl;
-    std::cout << "        协议执行总通信开销统计" << std::endl; 
+    std::cout << "        协议通信开销统计" << std::endl; 
     std::cout << "========================================" << std::endl;
-    // 换算成KB
-    std::cout << "总通信开销: " << total_com_bytes << " Bytes" << " (" << (double)total_com_bytes / 1024.0 << " KB)" << std::endl;
-    std::cout << "(DH-OPRF " << p1_com_bytes << " Bytes, Batch PIR " << p4_com_bytes 
-              << " Bytes, OT " << p5_com_bytes << " Bytes)" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "1. OPRF 通信:" 
+              << std::right << std::setw(TIME_WIDTH) << p1_com_bytes << " Bytes" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "2. Batch PIR 通信:" 
+              << std::right << std::setw(TIME_WIDTH) << p4_com_bytes << " Bytes" << std::endl;
+    
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "3. OT 通信:" 
+              << std::right << std::setw(TIME_WIDTH) << p5_com_bytes << " Bytes" << std::endl;
+    
+    std::cout << "----------------------------------------" << std::endl;
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "总通信开销:" 
+              << std::right << std::setw(TIME_WIDTH) << total_com_bytes << " Bytes" << std::endl;
+    std::cout << std::left << std::setw(LABEL_WIDTH) << "" 
+              << std::right << std::setw(TIME_WIDTH) << std::setprecision(2) << (double)total_com_bytes / 1024.0 << " KB" << std::endl;
     std::cout << "========================================" << std::endl;
-
+    
     // 格式化汇总输出 (单位: 秒)
-    std::cout << "\n============format online result(s)============================" << std::endl;
-    // 打印receiver和sender的数据规模
-    std::cout << "Sender_size " << sender_size << " Receiver_size " << receiver_size << " Payload_size_bytes " << payload_size << std::endl;
-    std::cout << std::fixed << std::setprecision(3) << (double)total_protocol_time / 1000.0 << std::endl;
-    std::cout << "(OPRF " << std::setprecision(3) << (double)dur_oprf / 1000.0 
-              << " Gen_idx " << std::setprecision(3) << (double)dur_hash / 1000.0 
-              << " Query_idx " << std::setprecision(3) << (double)dur_pir / 1000.0 
-              << " Get_key " << std::setprecision(3) << (double)dur_ot / 1000.0 
-              << " Dec " << std::setprecision(3) << (double)dur_decrypt / 1000.0 << ")" << std::endl;
+    std::cout << "\n========== Overall Result (s/MB) ==========" << std::endl;
+    std::cout << "Dataset: Sender=" << sender_size << " Receiver=" << receiver_size << " Payload=" << payload_size << " bytes" << std::endl;
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << "Total_online: " << total_online_time / 1000.0 << " s" << std::endl;
+    std::cout << "Total_offline: " << total_offline_time / 1000.0 << " s" << std::endl;
+    std::cout << "Total_time: " << total_protocol_time / 1000.0 << " s" << std::endl;
+    std::cout << "Breakdown_offline: OPRF=" << dur_oprf_offline / 1000.0 
+              << " Gen_idx_sender=" << offline_sender_genidx_time / 1000.0 
+              << " PIR_prep=" << offline_pir_prep_time / 1000.0 
+              << " OT_base=" << ot_offline_time / 1000.0 << std::endl;
+    std::cout << "Breakdown_online: OPRF=" << dur_oprf_online / 1000.0 
+              << " Gen_idx_receiver=" << online_receiver_genidx_time / 1000.0 
+              << " PIR_query=" << online_pir_process_time / 1000.0 
+              << " OT_ext=" << ot_online_time / 1000.0 
+              << " Dec=" << (double)dur_decrypt / 1000.0 << std::endl;
+    std::cout << "Communication: " << total_com_bytes << " Bytes (" << (double)total_com_bytes / 1024.0 << " KB, " << (double)total_com_bytes / (1024.0 * 1024.0) << " MB)" << std::endl;
+    std::cout << "================================================" << std::endl;
+
+    // CSV格式输出：Sender,Receiver,Payload,sum_online,oprf_on,gen_idx_on,query_on,ot_on,dec_on,sum_offline,oprf_off,gen_idx_off,pir_off,ot_off,com
+    std::cout << "\n========== CSV Format Output ==========" << std::endl;
+    std::cout << sender_size << ","
+              << receiver_size << ","
+              << payload_size << ","
+              << std::fixed << std::setprecision(3)
+              << total_online_time / 1000.0 << ","
+              << dur_oprf_online / 1000.0 << ","
+              << online_receiver_genidx_time / 1000.0 << ","
+              << online_pir_process_time / 1000.0 << ","
+              << ot_online_time / 1000.0 << ","
+              << (double)dur_decrypt / 1000.0 << ","
+              << total_offline_time / 1000.0 << ","
+              << dur_oprf_offline / 1000.0 << ","
+              << offline_sender_genidx_time / 1000.0 << ","
+              << offline_pir_prep_time / 1000.0 << ","
+              << ot_offline_time / 1000.0 << ","
+              << (double)total_com_bytes / (1024.0 * 1024.0) << std::endl;
+    std::cout << "=======================================" << std::endl;
+    
+    
     return 0;
 }
 

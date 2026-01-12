@@ -342,8 +342,10 @@ bool run_oos_ot(
     std::vector<Element>& receiver_outputs,
     size_t& com_bytes,
     uint32_t input_bit_count,
-    bool malicious) {
-    
+    bool malicious,
+    double* offline_time_ms,
+    double* online_time_ms) {
+
     try {
         auto start_time = std::chrono::high_resolution_clock::now();
         
@@ -373,7 +375,8 @@ bool run_oos_ot(
                 throw std::runtime_error("Invalid choice at OT " + std::to_string(i));
             }
         }
-        
+        // offline 
+
         // 创建OT对象
         OosNcoOtSender sender;
         OosNcoOtReceiver receiver;
@@ -388,7 +391,7 @@ bool run_oos_ot(
         PRNG prng0(block(4253465, 334565));
         PRNG prng1(block(42532335, 334565));
         
-        // Base OT
+        // Base OT (offline 阶段)
         auto base_start = std::chrono::high_resolution_clock::now();
         setBaseOts(sender, receiver, prng0, prng1, socks[0], socks[1]);
         auto base_end = std::chrono::high_resolution_clock::now();
@@ -398,7 +401,9 @@ bool run_oos_ot(
         // 记录 Base OT 后的通信量
         size_t bytes_after_base = socks[0].bytesReceived() + socks[1].bytesReceived();
         
-        // Extension阶段
+        // online
+
+        // Extension阶段 (online 阶段)
         auto ext_start = std::chrono::high_resolution_clock::now();
         
         auto p0 = receiverExtensionTask(receiver, numOTs, input_bit_count, malicious,
@@ -415,7 +420,23 @@ bool run_oos_ot(
         double total_time = std::chrono::duration<double, std::milli>(total_end - start_time).count();
         
         // 计算总通信量（双向）
-        com_bytes = socks[0].bytesReceived() + socks[1].bytesReceived();
+        size_t total_com_bytes = socks[0].bytesReceived() + socks[1].bytesReceived();
+        // 打印based ot通信和扩展通信量
+        std::cout << "[run_oos_ot] Base OT communication: " << bytes_after_base << " bytes" << std::endl;
+        std::cout << "[run_oos_ot] Extension communication: " << (total_com_bytes - bytes_after_base) << " bytes" << std::endl;
+        com_bytes = total_com_bytes - bytes_after_base;
+        
+        // 返回时间统计信息
+        if (offline_time_ms != nullptr) {
+            *offline_time_ms = base_time;
+        }
+        if (online_time_ms != nullptr) {
+            *online_time_ms = ext_time;
+        }
+        
+        std::cout << "[run_oos_ot] Offline time (Base OT): " << base_time << " ms" << std::endl;
+        std::cout << "[run_oos_ot] Online time (Extension): " << ext_time << " ms" << std::endl;
+        std::cout << "[run_oos_ot] Total time: " << total_time << " ms" << std::endl;
         
         return true;
         
