@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 # 设置绘图风格，使其美观且适合论文发表
 # 使用 seaborn 的样式作为基础 (如果未安装 seaborn，可以注释掉这两行)
@@ -12,7 +13,8 @@ except ImportError:
     plt.style.use('ggplot')
 
 # 读取数据
-file_name = 'benchmark_2_20.csv'
+script_dir = os.path.dirname(os.path.abspath(__file__))
+file_name = f'{script_dir}/online_statistic_summary.csv'
 df = pd.read_csv(file_name)
 
 # 定义需要堆叠的列 (各阶段开销)
@@ -34,8 +36,9 @@ for col in stack_cols:
 # 获取所有的 Sender 类型
 senders = sorted(df_ms['Sender'].unique())
 
-# 创建画布，1行3列
-fig, axes = plt.subplots(1, 3, figsize=(18, 5.5), sharey=False)
+# 创建画布，2行2列 (因为有4个sender)
+fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharey=False)
+axes = axes.flatten()  # 将2x2数组展平为1维数组，方便索引
 
 # 遍历每个 Sender Size 进行绘图
 for i, sender in enumerate(senders):
@@ -65,15 +68,11 @@ for i, sender in enumerate(senders):
     
     # 设置 X 轴刻度
     ax.set_xticks(x_pos)
-    ax.set_xticklabels(receivers, fontsize=11)
+    ax.set_xticklabels(receivers, fontsize=10, rotation=45, ha='right')
     
-    # 仅在第一个图显示 Y 轴标签，避免冗余，但如果量级差异大，也可以都显示
-    if i == 0:
+    # 在左侧两个图显示 Y 轴标签
+    if i % 2 == 0:
         ax.set_ylabel('Latency Overhead (ms)', fontsize=12)
-    else:
-        # 如果需要每个图都显示Y轴标签，取消下面这行的注释
-        # ax.set_ylabel('Latency Overhead (ms)', fontsize=12)
-        pass
 
     # 设置网格线 (仅Y轴)
     ax.grid(axis='y', linestyle='--', alpha=0.5)
@@ -81,14 +80,15 @@ for i, sender in enumerate(senders):
     # 移除顶部和右侧的边框
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-
-# 在第一个子图中添加图例 (或者可以在图外添加)
-# loc='upper left' 把图例放在左上角
-axes[0].legend(loc='upper left', frameon=True, fontsize=10, framealpha=0.9, fancybox=True)
+    
+    # 为每个子图添加图例
+    ax.legend(loc='upper left', frameon=True, fontsize=9, framealpha=0.9, fancybox=True)
 
 # 调整布局以防止重叠
 plt.tight_layout()
 
 # 保存图片
-plt.savefig('latency_breakdown_stacked_bar.png', dpi=300, bbox_inches='tight')
+output_path = os.path.join(script_dir, 'micro_online_runtime.png')
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
 plt.show()
+print(f"Figure saved to {output_path}")
