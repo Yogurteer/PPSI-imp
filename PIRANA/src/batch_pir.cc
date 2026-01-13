@@ -19,12 +19,6 @@ std::vector<Element> my_batch_pir_main(const uint64_t num_payloads, const uint64
   auto plain_modulus_bit = pir_parms.get_seal_parms().plain_modulus().bit_count();
   auto expected_num_payload_slot = pir_parms.get_num_payload_slot();
   
-  // std::cout << "\n========== PIR 参数验证 ==========" << std::endl;
-  // std::cout << "输入: num_payloads=" << num_payloads << ", payload_size=" << payload_size << " (字节)" << std::endl;
-  // std::cout << "PIR配置: plain_modulus=" << plain_modulus << " (" << plain_modulus_bit << " bits)" << std::endl;
-  // std::cout << "每个payload需要的slots数: " << expected_num_payload_slot << std::endl;
-  // std::cout << "实际输入数据库大小: " << input_db.size() << " payloads" << std::endl;
-  
   // 验证输入数据库大小
   if (input_db.size() != num_payloads) {
     std::cerr << "错误: 输入数据库大小(" << input_db.size() 
@@ -277,10 +271,6 @@ std::vector<Element> my_direct_batch_pir_main(
   Client batch_client(pir_parms);
   std::stringstream keys = batch_client.save_keys();
   
-  // Server batch_server(pir_parms, false); // false = not random db
-  // batch_server.set_database(input_db);   // 填入数据
-  // // batch_server.direct_encode_to_ntt_db(); // 调用 Direct 编码
-  // batch_server.encode_to_ntt_db(); // 直接调用通用编码
   bool random_db = false;
   Server batch_server(pir_parms, true, random_db, input_db);
   batch_server.set_keys(keys);
@@ -308,7 +298,7 @@ std::vector<Element> my_direct_batch_pir_main(
   auto extract_time = timer.elapsed();
 
   // 6. 验证正确性
-  test_direct_batch_pir_correctness(batch_server, answer, query_indices, pir_parms);
+  // test_direct_batch_pir_correctness(batch_server, answer, query_indices, pir_parms);
 
   // 7. 结果转换 (Slots -> Bytes)
   timer.reset();

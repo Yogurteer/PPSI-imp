@@ -42,11 +42,6 @@ class Server {
   void encode_to_ntt_db();
   void batch_encode_to_ntt_db_without_compress();
   void batch_encode_to_ntt_db_with_compress();
-  // 新增：直接编码数据库 (No Cuckoo Bucket)
-  void direct_encode_to_ntt_db();
-  
-  // // 自己实现：直接编码数据库，不使用Cuckoo Hash bucket
-  // void direct_encode_to_ntt_db_no_cuckoo();
 
   std::vector<seal::Ciphertext> load_query(std::stringstream &query_stream,
                                            uint32_t query_ct_size);
