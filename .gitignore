@@ -1,7 +1,11 @@
-build/
 latest_protocol/build/
 .vscode/
 protocol_v2/test_logs/
 protocol_v2/log/
-protocol_v2/data/
+protocol_v2/data/*.txt
+protocol_v2/data/*.csv
+*.tar.gz
+cuckoo_hash/
+test_oosOT/
+test_PIR/
 

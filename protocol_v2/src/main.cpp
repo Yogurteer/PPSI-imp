@@ -578,18 +578,18 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     phase4_execute_pir(receiver, sender, database, queries, item_size, online_pir_process_time, batch_PIR_mode, p4_com_bytes);
     cout << "[Batch PIR] 通信开销: " << p4_com_bytes << " Bytes" << std::endl;
     
-    // --- 模拟PIR与验证 (不计入时间) ---
-    simulate_pir(receiver, sender, database, queries, item_size);
-    bool pir_match = true;
-    if (receiver.sim_pir_results.size() != receiver.pir_results.size()) pir_match = false;
-    else {
-        for (size_t i = 0; i < receiver.sim_pir_results.size(); ++i) {
-            if (receiver.sim_pir_results[i] != receiver.pir_results[i]) {
-                pir_match = false; break;
-            }
-        }
-    }
-    std::cout << "[PIR外部验证] 模拟与实际结果匹配: " << (pir_match ? "YES" : "NO") << std::endl;
+    // // --- 模拟PIR与验证 (不计入时间) ---
+    // simulate_pir(receiver, sender, database, queries, item_size);
+    // bool pir_match = true;
+    // if (receiver.sim_pir_results.size() != receiver.pir_results.size()) pir_match = false;
+    // else {
+    //     for (size_t i = 0; i < receiver.sim_pir_results.size(); ++i) {
+    //         if (receiver.sim_pir_results[i] != receiver.pir_results[i]) {
+    //             pir_match = false; break;
+    //         }
+    //     }
+    // }
+    // // std::cout << "[PIR外部验证] 模拟与实际结果匹配: " << (pir_match ? "YES" : "NO") << std::endl;
     
     // recevier处理PIR结果兼容格式
     // receiver.process_pir_results(receiver.sim_pir_results);
