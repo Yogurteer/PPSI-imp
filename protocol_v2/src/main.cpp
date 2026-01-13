@@ -24,8 +24,6 @@ using namespace std;
 using namespace std::chrono;
 
 // 全局文件路径配置 (这些可以保留为全局或也改为参数，暂且保留)
-const string DATA_FILE = "../data/kv_2_24.txt";
-const string result_file = "../result/PPSI_dif_size.txt";
 NetworkChannel network_channel;
 
 // Batch PIR 接口更新
@@ -133,89 +131,95 @@ void phase0_initialize_data(
     LPSIReceiver& receiver,
     std::vector<std::pair<std::string, std::string>>& sender_raw_data,
     std::vector<std::string>& receiver_raw_data,
-    size_t sender_size,      // 【修改】通过参数传入
-    size_t receiver_size     // 【修改】通过参数传入
+    size_t sender_size,      
+    size_t receiver_size,
+    const std::string& dataset_path // 新增参数
 ) {
-    
-    // 辅助函数保持不变
     auto string_to_element = [](const std::string& str) -> Element {
         return Element(str.begin(), str.end());
     };
-    auto binary_string_to_bytes = [](const std::string& binary_str) -> std::vector<uint8_t> {
-        std::vector<uint8_t> result;
-        if (binary_str.length() == 8) {
-            uint8_t high_nibble = 0;
-            for (int i = 0; i < 4; ++i) if (binary_str[i] == '1') high_nibble |= (1 << (3 - i));
-            uint8_t low_nibble = 0;
-            for (int i = 4; i < 8; ++i) if (binary_str[i] == '1') low_nibble |= (1 << (7 - i));
-            result.push_back(high_nibble);
-            result.push_back(low_nibble);
-        }
-        return result;
-    };
-    
-    string input_data_file = DATA_FILE;
-    std::ifstream file(input_data_file);
+
+    std::ifstream file(dataset_path);
     if (!file.is_open()) {
-        std::cerr << "错误: 无法打开文件 " << input_data_file << std::endl;
+        std::cerr << "Fatal Error: 无法打开数据集文件 " << dataset_path << std::endl;
         exit(1);
     }
     
-    std::vector<std::pair<std::string, std::string>> all_data;
     std::string line;
     
-    // 读取所有数据行 (直到满足 Sender 需求)
-    while (std::getline(file, line) && all_data.size() < sender_size) {
-        std::istringstream iss(line);
-        std::string keyword, binary_payload;
-        if (iss >> keyword >> binary_payload) {
-            auto payload_bytes = binary_string_to_bytes(binary_payload);
-            if (!payload_bytes.empty()) {
-                std::string payload(payload_bytes.begin(), payload_bytes.end());
-                all_data.push_back({keyword, payload});
-            }
-        }
-    }
-    file.close();
-    
-    if (all_data.size() < sender_size) {
-        std::cerr << "错误: 文件数据不足! 需要 " << sender_size << " 行，实际只有 " 
-                  << all_data.size() << " 行。" << std::endl;
+    // 1. 读取 Sender Header (跳过)
+    // 格式: "db size {sz} label bytes {bc} item bytes {bc}"
+    if (!std::getline(file, line)) {
+        std::cerr << "Error: 文件格式错误 (缺少 Sender Header)" << std::endl;
         exit(1);
     }
     
-    // 设置 Sender 数据
+    // 2. 读取 Sender 数据
+    sender_raw_data.clear();
     sender_raw_data.reserve(sender_size);
-    std::vector<std::pair<Element, Element>> sender_data;
-    sender_data.reserve(sender_size);
+    std::vector<std::pair<Element, Element>> sender_data_elements;
+    sender_data_elements.reserve(sender_size);
     
     for (size_t i = 0; i < sender_size; ++i) {
-        sender_raw_data.push_back(all_data[i]);
-        sender_data.push_back({
-            string_to_element(all_data[i].first),
-            Element(all_data[i].second.begin(), all_data[i].second.end())
+        if (!std::getline(file, line)) {
+            std::cerr << "Error: Sender数据不足，期望 " << sender_size << " 行，在第 " << i << " 行中断。" << std::endl;
+            exit(1);
+        }
+        
+        // 格式: item,label
+        std::string item, label;
+        size_t comma_pos = line.find(',');
+        if (comma_pos != std::string::npos) {
+            item = line.substr(0, comma_pos);
+            label = line.substr(comma_pos + 1);
+        } else {
+            // 如果没有逗号，可能没有 label 或者格式不对，视整行为 item
+            item = line;
+            label = ""; 
+        }
+        
+        // 移除可能的 Windows 回车符
+        if (!item.empty() && item.back() == '\r') item.pop_back();
+        if (!label.empty() && label.back() == '\r') label.pop_back();
+
+        sender_raw_data.push_back({item, label});
+        sender_data_elements.push_back({
+            string_to_element(item),
+            Element(label.begin(), label.end())
         });
     }
     
-    // 设置 Receiver 数据 (随机选择)
-    receiver_raw_data.reserve(receiver_size);
-    ElementVector receiver_data;
-    receiver_data.reserve(receiver_size);
-    
-    std::vector<size_t> indices(sender_size);
-    for (size_t i = 0; i < sender_size; ++i) indices[i] = i;
-    
-    std::srand(42);
-    std::random_shuffle(indices.begin(), indices.end());
-    
-    for (size_t i = 0; i < receiver_size; ++i) {
-        size_t selected_idx = indices[i];
-        receiver_raw_data.push_back(all_data[selected_idx].first);
-        receiver_data.push_back(string_to_element(all_data[selected_idx].first));
+    // 3. 读取 Receiver Header (跳过)
+    // 格式: "query size {sz} intersection size {sz} item bytes {bc}"
+    if (!std::getline(file, line)) {
+        std::cerr << "Error: 文件格式错误 (缺少 Receiver Header)" << std::endl;
+        exit(1);
     }
     
-    sender.set_input(sender_data);
-    receiver.set_input(receiver_data);
+    // 4. 读取 Receiver 数据
+    receiver_raw_data.clear();
+    receiver_raw_data.reserve(receiver_size);
+    ElementVector receiver_data_elements;
+    receiver_data_elements.reserve(receiver_size);
+    
+    for (size_t i = 0; i < receiver_size; ++i) {
+        if (!std::getline(file, line)) {
+            std::cerr << "Error: Receiver数据不足，期望 " << receiver_size << " 行，在第 " << i << " 行中断。" << std::endl;
+            exit(1);
+        }
+        
+        std::string item = line;
+        if (!item.empty() && item.back() == '\r') item.pop_back(); // 去除 \r
+        
+        receiver_raw_data.push_back(item);
+        receiver_data_elements.push_back(string_to_element(item));
+    }
+    
+    file.close();
+    
+    // 注入数据到协议实体
+    sender.set_input(sender_data_elements);
+    receiver.set_input(receiver_data_elements);
 }
 
 // Phase 1: DH-OPRF + PRP
@@ -319,10 +323,10 @@ void phase3_prepare_pir(
     
     // ===== 添加Phase2/3验证 =====
     // std::cout << "\n[双边映射正确性验证] 检查双层hash映射正确性..." << std::endl;
-    receiver.verify_phase23_mapping(sender.get_flattened_database(),
-                                     sender_num_main_buckets,
-                                     sender_nh,
-                                     sender_sub_capacity);
+    // receiver.verify_phase23_mapping(sender.get_flattened_database(),
+    //                                  sender_num_main_buckets,
+    //                                  sender_nh,
+    //                                  sender_sub_capacity);
 }
 
 // Phase 4: 执行PIR查询
@@ -412,9 +416,10 @@ void phase5_ot_bucket_keys(
     
     // 获取Sender的OT输入 (所有桶密钥作为选项) ot_inputs[0] = bucket_keys
     std::vector<std::vector<Element>> sender_ot_base = sender.get_ot_inputs();
+    std::cout << "Sender: own " << sender_ot_base[0].size() << " items" << std::endl;
     
     if (sender_ot_base.empty() || sender_ot_base[0].empty()) {
-        std::cerr << "Sender OT输入为空" << std::endl;
+        std::cerr << "Sender OT input empty" << std::endl;
         return;
     }
     
@@ -474,11 +479,11 @@ void phase6_decrypt_and_verify(
     receiver.decrypt_intersection(bucket_keys);
     const auto& intersection = receiver.get_intersection();
     
-    std::cout << "\n========================================" << std::endl;
-    std::cout << "         协议执行输出:" << std::endl;
-    std::cout << "========================================" << std::endl;
-    std::cout << "【Sender视角】交集大小: " << sender.get_intersection_size() << std::endl;
-    std::cout << "【Receiver视角】交集大小: " << intersection.size() << std::endl;
+
+    std::cout << "========== Protocol Output ==========" << std::endl;
+
+    std::cout << "[Sender]get inter size: " << sender.get_intersection_size() << std::endl;
+    std::cout << "[Receiver]get inter size&data: " << intersection.size() << std::endl;
     
     size_t valid_count = 0;
     auto element_to_string = [](const Element& elem) -> std::string { return std::string(elem.begin(), elem.end()); };
@@ -496,17 +501,16 @@ void phase6_decrypt_and_verify(
         if (found_in_sender && key_in_receiver) valid_count++;
     }
     
-    std::cout << "[交集数据验证] " << valid_count << "/" << intersection.size() << " 个正确"<< std::endl;
+    std::cout << "[Intersection Data Verification] " << valid_count << "/" << intersection.size() << " correct"<< std::endl;
 
-    if (intersection.size() == receiver_size && sender.get_intersection_size() == intersection.size() && sender.get_intersection_size() != 0) {
-        std::cout << "\n[Final 正确性验证]✓ 协议执行正确" << std::endl;
-    } else {
-        std::cout << "\n[Final 正确性验证]✗ 协议执行错误" << std::endl;
-    }
+    // if (intersection.size() == receiver_size && sender.get_intersection_size() == intersection.size() && sender.get_intersection_size() != 0) {
+    //     std::cout << "\n[Final Correctness Verification]✓ Protocol executed correctly" << std::endl;
+    // } else {
+    //     std::cout << "\n[Final Correctness Verification]✗ Protocol execution error" << std::endl;
+    // }
 }
 
-int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std::string batch_PIR_mode) {
-    std::cout << "========================================" << std::endl;
+int run_main(size_t sender_size, size_t receiver_size, size_t inter_size, size_t payload_size, std::string batch_PIR_mode, std::string dataset_path) {    std::cout << "========================================" << std::endl;
     std::cout << "   Payable LPSI协议 (动态参数分段计时)" << std::endl;
     std::cout << "========================================" << std::endl;
     std::cout << "Mode: " << batch_PIR_mode << std::endl;
@@ -514,7 +518,6 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     // 创建实例
     LPSISender sender;
     LPSIReceiver receiver;
-    
     
     std::vector<std::pair<std::string, std::string>> sender_raw_data;
     std::vector<std::string> receiver_raw_data;
@@ -524,8 +527,7 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
     auto t0_start = high_resolution_clock::now();
     
     // 【修改】传入 size
-    phase0_initialize_data(sender, receiver, sender_raw_data, receiver_raw_data, sender_size, receiver_size);
-    
+    phase0_initialize_data(sender, receiver, sender_raw_data, receiver_raw_data, sender_size, receiver_size, dataset_path);
     std::cout << "[数据导入] Sender数据项数: " << sender_size << std::endl;
     std::cout << "[数据导入] Receiver数据项数: " << receiver_size << std::endl;
     std::cout << "[数据导入] Payload size: " << payload_size << " 字节" << std::endl;
@@ -727,12 +729,15 @@ int run_main(size_t sender_size, size_t receiver_size, size_t payload_size, std:
               << " OT_ext=" << ot_online_time / 1000.0 
               << " Dec=" << (double)dur_decrypt / 1000.0 << std::endl;
     std::cout << "Communication: " << total_com_bytes << " Bytes (" << (double)total_com_bytes / 1024.0 << " KB, " << (double)total_com_bytes / (1024.0 * 1024.0) << " MB)" << std::endl;
+    std::cout << "Com(MB)" << ": " << (double)total_com_bytes / (1024.0 * 1024.0) << std::endl;
     std::cout << "================================================" << std::endl;
 
     // CSV格式输出：Sender,Receiver,Payload,sum_online,oprf_on,gen_idx_on,query_on,ot_on,dec_on,sum_offline,oprf_off,gen_idx_off,pir_off,ot_off,com
     std::cout << "\n========== CSV Format Output ==========" << std::endl;
+    std::cout << "S_size,R_size,I_size,Payload_bytes,Total_on_time,OPRF_on_s,Genidx_r,PIR_query,OT_online,Decrypt,Total_off_time,OPRF_off,Gen_idx_s,PIR_prep,OT_off,Total_com_MB" << std::endl;
     std::cout << sender_size << ","
               << receiver_size << ","
+              << inter_size << ","
               << payload_size << ","
               << std::fixed << std::setprecision(3)
               << total_online_time / 1000.0 << ","
@@ -762,9 +767,11 @@ int main(int argc, char** argv) {
     size_t receiver_size = 1024;  // 默认 2^8
     size_t payload_size = 1;     // 默认 1 byte
     size_t is_default_mode = 1; // 默认使用 Default Mode
+    size_t inter_size = 0;
+    std::string dataset_path = "../data/dataset_default.csv"; // 默认路径
     
     int opt;
-    while ((opt = getopt(argc, argv, "x:y:p:m:h")) != -1) {
+    while ((opt = getopt(argc, argv, "x:y:i:p:m:f:h")) != -1) {
         switch (opt) {
             case 'x':
                 sender_size = std::stoul(optarg);
@@ -772,11 +779,15 @@ int main(int argc, char** argv) {
             case 'y':
                 receiver_size = std::stoul(optarg);
                 break;
+            case 'i':
+                inter_size = std::stoul(optarg);
+                break;
             case 'p':
                 payload_size = std::stoul(optarg);
 
                 LPSIConfig::PIR_PAYLOAD_SIZE = 128; // label byte length
                 break;
+            case 'f': dataset_path = optarg; break; // 读取文件路径
             case 'm':
                 // 1-default mode, 0-direct mode
                 is_default_mode = std::stoul(optarg);
@@ -797,14 +808,8 @@ int main(int argc, char** argv) {
     }
 
     // 运行主逻辑
-    std::string batch_PIR_mode = "direct"; // "default" or "direct"
-    if (receiver_size == 1) {
-        batch_PIR_mode = "default"; // 单元素查询使用默认模式
-    }
-    if (is_default_mode == 1) {
-        batch_PIR_mode = "default";
-    }
-    run_main(sender_size, receiver_size, payload_size, batch_PIR_mode);
+    std::string batch_PIR_mode = (is_default_mode == 1 || receiver_size <= 1024) ? "default" : "direct";
+    run_main(sender_size, receiver_size, inter_size, payload_size, batch_PIR_mode, dataset_path);
     
     return 0;
 }

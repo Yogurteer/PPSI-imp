@@ -1,3 +1,0 @@
-/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI2/protocol_v2/build/CMakeFiles/lpsi_test.dir
-/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI2/protocol_v2/build/CMakeFiles/edit_cache.dir
-/home/zzp/code/payable_develop/zzp_repo_pPSI/repo_payablePSI2/protocol_v2/build/CMakeFiles/rebuild_cache.dir

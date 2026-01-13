@@ -612,7 +612,7 @@ std::vector<size_t> LPSIReceiver::get_ot_choices() const {
         }
     }
     
-    std::cout << "Receiver: 生成 " << choices.size() << " 个OT选择索引" << std::endl;
+    std::cout << "Receiver: gen " << choices.size() << " choice idxs" << std::endl;
     return choices;
 }
 
