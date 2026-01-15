@@ -34,7 +34,6 @@ set(PIRANA_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../PIRANA/src")
 # 包含目录
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/thirdparty/oos_OT
     ${PIRANA_SRC_DIR}
     ${LIBOTE_ROOT}
     ${LIBOTE_ROOT}/libOTe
@@ -83,11 +82,6 @@ set(LPSI_SOURCES
     src/oos_ot.cpp
     src/main.cpp
     src/config.cpp
-)
-
-# OT库源文件
-set(OT_SOURCES
-    thirdparty/oos_OT/oos_OT.cpp
 )
 
 # 生成可执行文件

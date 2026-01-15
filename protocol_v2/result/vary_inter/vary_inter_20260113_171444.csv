@@ -1,2 +1,0 @@
-Sender_Size,Receiver_Size,Intersection_Size,Intersection_Percentage,Label_Size,Item_Size,PIR_Mode,Status,Total_Online(s),Total_Offline(s),Communication(MB)
-1048576,4096,1,.02%,32,8,0,SUCCESS,26.338,427.236,35.396

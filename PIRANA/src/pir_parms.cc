@@ -54,8 +54,10 @@ PirParms::PirParms(const uint64_t num_payloads, const uint64_t payload_size,
   assert(is_batch == true && num_query > 1);
 
   // 原始参数设置
-  uint64_t poly_degree = 4096;
-  std::vector<int> coeff_modulus = {48, 32, 24};
+  uint64_t poly_degree = 8192; 
+  std::vector<int> coeff_modulus;
+  if (poly_degree == 4096) coeff_modulus = {48, 32, 24};
+  else if (poly_degree == 8192) coeff_modulus = {56, 56, 24, 24};
 
   // 优化后参数设置,适配大规模Batch PIR,DB size 2^20起步
   // uint64_t poly_degree = 8192;

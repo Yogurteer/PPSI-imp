@@ -3,42 +3,31 @@
 set -e  # 遇到错误立即退出
 
 # ================= 固定参数配置 =================
-SENDER_SIZE=1048576      
-RECEIVER_SIZE=4096       
-LABEL_SIZE=32            
-ITEM_SIZE=8               
+SENDER_SIZE=1048576 
+LABEL_SIZE=1             
+ITEM_SIZE=16               
 PIR_MODE=0               
 PRINT_MODE='SIMPLE'  # SIMPLE or DETAILED
 
-# 交集大小测试范围: 1个, 10%, 20%, ..., 100%
-# 首先测试交集为1,然后从10%到100%
-# INTERSECTION_SIZES=(1)
-# for PERCENT in 10 20 30 40 50 60 70 80 90 100; do
-#     SIZE=$(echo "scale=0; ($RECEIVER_SIZE * $PERCENT + 99) / 100" | bc)
-#     INTERSECTION_SIZES+=($SIZE)
-# done
-
-INTERSECTION_SIZES=(1)
-for PERCENT in 10 20 30; do
-    SIZE=$(echo "scale=0; ($RECEIVER_SIZE * $PERCENT + 99) / 100" | bc)
-    INTERSECTION_SIZES+=($SIZE)
-done
+# Receiver Size测试范围: 1, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12
+# Intersection Size与Receiver Size一致
+RECEIVER_SIZES=(1 64 128 256 512 1024 2048 4096)
 
 # 路径配置
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DATA_DIR="$SCRIPT_DIR/data"
 BUILD_DIR="$SCRIPT_DIR/build"
-RESULT_DIR="$SCRIPT_DIR/result/vary_inter"
+RESULT_DIR="$SCRIPT_DIR/result/psi"
 
 # 创建结果目录
 mkdir -p "$RESULT_DIR"
 
 # 生成时间戳作为结果文件名
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-RESULT_FILE="$RESULT_DIR/vary_inter_${TIMESTAMP}.csv"
+RESULT_FILE="$RESULT_DIR/pure_psi_${TIMESTAMP}.csv"
 
 # 计算总测试数
-TOTAL_TESTS=${#INTERSECTION_SIZES[@]}
+TOTAL_TESTS=${#RECEIVER_SIZES[@]}
 
 # ================= 编译阶段 =================
 echo -e "\033[0;34m[Build]\033[0m Compiling..."
@@ -63,30 +52,38 @@ echo ""
 
 # ================= 初始化结果文件 =================
 echo "Writing results to: $RESULT_FILE"
-echo "Sender_Size,Receiver_Size,Intersection_Size,Intersection_Percentage,Label_Size,Item_Size,PIR_Mode,Status,Total_Online(s),Total_Offline(s),Communication(MB)" > "$RESULT_FILE"
+echo "Sender_Size,Receiver_Size,Intersection_Size,Label_Size,Item_Size,PIR_Mode,Status,Total_Online(s),Total_Offline(s),Communication(MB)" > "$RESULT_FILE"
 echo ""
 
 # ================= 批量测试循环 =================
 echo -e "\033[1;36m========================================\033[0m"
-echo -e "\033[1;36m  Batch Test: Varying Intersection Size\033[0m"
+echo -e "\033[1;36m  Batch Test: Pure PSI Performance\033[0m"
 echo -e "\033[1;36m========================================\033[0m"
-echo "Sender Size: $SENDER_SIZE"
-echo "Receiver Size: $RECEIVER_SIZE"
+echo "Sender Size: $SENDER_SIZE (2^20)"
 echo "Label Size: $LABEL_SIZE bytes"
 echo "Item Size: $ITEM_SIZE bytes"
 echo "PIR Mode: $PIR_MODE"
+echo "Intersection Size = Receiver Size (100% overlap)"
 echo -e "\033[1;36m========================================\033[0m"
 echo ""
 
 CURRENT_TEST=0
 
-for INTERSECTION_SIZE in "${INTERSECTION_SIZES[@]}"; do
+for RECEIVER_SIZE in "${RECEIVER_SIZES[@]}"; do
     CURRENT_TEST=$((CURRENT_TEST + 1))
     
-    # 计算交集占比
-    PERCENT=$(echo "scale=2; $INTERSECTION_SIZE * 100 / $RECEIVER_SIZE" | bc)
+    # 交集大小等于Receiver Size
+    INTERSECTION_SIZE=$RECEIVER_SIZE
     
-    echo -e "\033[1;33m[Test $CURRENT_TEST/$TOTAL_TESTS]\033[0m Intersection = $INTERSECTION_SIZE ($PERCENT% of Receiver)"
+    # 计算Receiver Size对应的2的幂次
+    if [ $RECEIVER_SIZE -eq 1 ]; then
+        SIZE_DESC="1"
+    else
+        POWER=$(echo "l($RECEIVER_SIZE)/l(2)" | bc -l | xargs printf "%.0f")
+        SIZE_DESC="2^$POWER"
+    fi
+    
+    echo -e "\033[1;33m[Test $CURRENT_TEST/$TOTAL_TESTS]\033[0m Receiver Size = $RECEIVER_SIZE ($SIZE_DESC)"
     echo "----------------------------------------"
     
     # 数据集文件名生成
@@ -105,7 +102,7 @@ for INTERSECTION_SIZE in "${INTERSECTION_SIZES[@]}"; do
             
         if [ $? -ne 0 ]; then
             echo -e "\033[0;31m❌ Error generating dataset!\033[0m"
-            echo "$SENDER_SIZE,$RECEIVER_SIZE,$INTERSECTION_SIZE,${PERCENT}%,$LABEL_SIZE,$ITEM_SIZE,$PIR_MODE,FAILED,-,-,-" >> "$RESULT_FILE"
+            echo "$SENDER_SIZE,$RECEIVER_SIZE,$INTERSECTION_SIZE,$LABEL_SIZE,$ITEM_SIZE,$PIR_MODE,FAILED,-,-,-" >> "$RESULT_FILE"
             echo -e "\033[0;31m\n🛑 Test aborted due to data generation failure.\033[0m"
             exit 1
         fi
@@ -136,7 +133,7 @@ for INTERSECTION_SIZE in "${INTERSECTION_SIZES[@]}"; do
         echo "$OUTPUT" | tail -n 15
         
         # 记录失败信息
-        echo "$SENDER_SIZE,$RECEIVER_SIZE,$INTERSECTION_SIZE,${PERCENT}%,$LABEL_SIZE,$ITEM_SIZE,$PIR_MODE,FAILED,-,-,-" >> "$RESULT_FILE"
+        echo "$SENDER_SIZE,$RECEIVER_SIZE,$INTERSECTION_SIZE,$LABEL_SIZE,$ITEM_SIZE,$PIR_MODE,FAILED,-,-,-" >> "$RESULT_FILE"
         
         echo -e "\033[0;31m\n🛑 Test aborted due to execution failure.\033[0m"
         echo -e "Results saved to: $RESULT_FILE"
@@ -155,7 +152,7 @@ for INTERSECTION_SIZE in "${INTERSECTION_SIZES[@]}"; do
         [ -z "$COMMUNICATION" ] && COMMUNICATION="-"
         
         # 记录成功及性能数据
-        echo "$SENDER_SIZE,$RECEIVER_SIZE,$INTERSECTION_SIZE,${PERCENT}%,$LABEL_SIZE,$ITEM_SIZE,$PIR_MODE,SUCCESS,$ONLINE_TIME,$OFFLINE_TIME,$COMMUNICATION" >> "$RESULT_FILE"
+        echo "$SENDER_SIZE,$RECEIVER_SIZE,$INTERSECTION_SIZE,$LABEL_SIZE,$ITEM_SIZE,$PIR_MODE,SUCCESS,$ONLINE_TIME,$OFFLINE_TIME,$COMMUNICATION" >> "$RESULT_FILE"
         
         # 根据模式打印输出
         if [ "$PRINT_MODE" == "DETAILED" ]; then
@@ -176,4 +173,3 @@ echo -e "\033[1;32m  ✓ All Tests Completed Successfully!\033[0m"
 echo -e "\033[1;32m========================================\033[0m"
 echo "Total tests executed: $TOTAL_TESTS"
 echo "Results saved to: $RESULT_FILE"
-

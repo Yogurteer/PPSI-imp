@@ -58,7 +58,7 @@ plt.tight_layout()
 
 # 4. 保存与显示
 # 保存为高分辨率图片,适合插入论文 (dpi=300)
-output_path = os.path.join(script_dir, 'onlinetime_comparison.png')
+output_path = os.path.join(script_dir, 'onlinetime_comparison_bar.png')
 plt.savefig(output_path, dpi=300, bbox_inches='tight')
 plt.show()
 

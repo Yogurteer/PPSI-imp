@@ -45,17 +45,17 @@ void batch_pir_main(const uint64_t num_payloads, const uint64_t payload_size,
                     const uint64_t num_query, const bool is_batch,
                     const bool is_compress) {
   std::cout << "Start batch PIR! " << std::endl;
+  Timer timer;
+  timer.reset();
   PirParms pir_parms(num_payloads, payload_size, num_query, is_batch,
                      is_compress);
   Client batch_client(pir_parms);
   std::stringstream keys = batch_client.save_keys();
   Server batch_server(pir_parms, is_batch, true);
-
   batch_server.set_keys(keys);
-
-  Timer timer;
+  auto init_time = timer.elapsed();
+  
   timer.reset();
-
   // random generate query
   std::vector<uint32_t> batch_query_index(num_query);
   for (auto &q : batch_query_index) {
@@ -75,6 +75,7 @@ void batch_pir_main(const uint64_t num_payloads, const uint64_t payload_size,
 
   std::cout << "------------------------------------" << std::endl;
   std::cout << "Performance: " << std::endl;
+  std::cout << "Init time: " << init_time << " ms " << std::endl;
   std::cout << "Gen query time: " << query_time << " ms " << std::endl;
   std::cout << "Gen response time: " << response_time << " ms " << std::endl;
   std::cout << "Extract answer time: " << extract_time << " ms "

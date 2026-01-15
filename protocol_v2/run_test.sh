@@ -3,12 +3,12 @@
 set -e  # 遇到错误立即退出
 
 # 设置参数
-SENDER_SIZE=1048576        
+SENDER_SIZE=4096        
 RECEIVER_SIZE=4096       
-INTERSECTION_SIZE=1
+INTERSECTION_SIZE=2048
 LABEL_SIZE=32            
 ITEM_SIZE=8               # 4 enough 2^20 sender size
-PIR_MODE=0               # 1 default 0 direct
+PIR_MODE=1               # 1 default 0 direct
 THREAD_COUNT=1
 TESTID="1"
 PRINT_MODE='DETAILED'  # SIMPLE or DETAILED
